@@ -1,0 +1,11 @@
+.gradle/
+build/
+run-*/
+research/
+libs/
+*.log
+.idea/
+compatibility/mods/
+*.reference
+release/
+client-screen.png

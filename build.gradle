@@ -1,0 +1,40 @@
+plugins {
+    id 'java-library'
+    id 'net.neoforged.moddev' version '2.0.146'
+}
+version = '0.2.0-dev'
+group = 'dev.sporebound'
+base { archivesName = 'sporebound' }
+java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+repositories { maven { url = 'https://www.cursemaven.com' } }
+dependencies {
+    implementation 'curse.maven:fungal-infection-spore-678295:8342823'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.11.4'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+neoForge {
+    version = '21.1.249'
+    runs {
+        server {
+            server()
+            gameDirectory = file(providers.gradleProperty('serverDir').getOrElse('run-server'))
+            programArgument '--nogui'
+            if (project.hasProperty('validation')) systemProperty 'sporebound.validation', project.property('validation')
+        }
+        client {
+            client(); gameDirectory = file('run-client')
+            if (project.hasProperty('clientValidation')) {
+                systemProperty 'sporebound.clientValidation', 'true'
+                programArguments.addAll '--quickPlaySingleplayer', 'sporebound-preview', '--width', '1280', '--height', '720'
+            }
+        }
+    }
+    mods { sporebound { sourceSet sourceSets.main } }
+}
+tasks.withType(JavaCompile).configureEach { options.encoding = 'UTF-8' }
+tasks.withType(JavaExec).configureEach { standardInput = System.in }
+tasks.named('test') { useJUnitPlatform() }
+tasks.named('processResources') {
+    inputs.property('version', project.version)
+    filesMatching('META-INF/neoforge.mods.toml') { expand(version: project.version) }
+}

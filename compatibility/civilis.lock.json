@@ -1,0 +1,26 @@
+{
+  "project_id": "Dx2SPPEi",
+  "project": "civillis",
+  "title": "Civillis",
+  "version_id": "VSlynytd",
+  "version": "2.0.1-release",
+  "minecraft": "1.21.1",
+  "loader": "neoforge",
+  "side": "both",
+  "filename": "civillis-neoforge-2.0.1-release+mc1.21.1.jar",
+  "url": "https://cdn.modrinth.com/data/Dx2SPPEi/versions/VSlynytd/civillis-neoforge-2.0.1-release%2Bmc1.21.1.jar",
+  "size": 747112,
+  "upstream_hashes": {
+    "sha512": "e9fe54f0ed70f31ca2f2a4728a4caec61877c290ace284865643a019b03aea4deb1aa5d242d072943b5e4770c616cfcf86d15ab060808c0fbc8cb6cd1e0dfd26",
+    "sha1": "bfbafa45acef77df0eb8fc3be56aff1047e3aee1"
+  },
+  "license": {
+    "id": "LicenseRef-All-Rights-Reserved",
+    "name": "",
+    "url": null
+  },
+  "source_url": "https://github.com/MaoxnZ/Civillis",
+  "project_url": "https://modrinth.com/mod/civillis",
+  "dependencies": [],
+  "sha256": "54af17b71061e5b161cd528d1b95874bedd44502668ad0803a28d5afb3cf0957"
+}

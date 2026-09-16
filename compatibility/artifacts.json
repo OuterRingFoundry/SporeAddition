@@ -1,0 +1,21 @@
+{
+  "minecraft": "1.21.1",
+  "neoforge": "21.1.249",
+  "java": 21,
+  "spore": {
+    "version": "2.2.0j",
+    "curseforge_file": 8342823,
+    "url": "https://www.curseforge.com/minecraft/mc-mods/fungal-infection-spore/files/8342823",
+    "sha256": "0cdb027eb53e6872bdb8de601dc52c176fcb6ddd33a0a2e20a66392937c3d5fe"
+  },
+  "concentricworld": {
+    "version": "0.31.0",
+    "filename": "concentricworld-0.31.0-neoforge-1.21.1.jar",
+    "sha256": "8722108d7259361746e66d696d450f196aa186a389370ec9e7c0c4c089fef1d1"
+  },
+  "civillis": {
+    "version": "2.0.1-release",
+    "filename": "civillis-neoforge-2.0.1-release+mc1.21.1.jar",
+    "sha256": "54af17b71061e5b161cd528d1b95874bedd44502668ad0803a28d5afb3cf0957"
+  }
+}

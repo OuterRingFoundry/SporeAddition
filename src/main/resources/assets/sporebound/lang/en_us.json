@@ -1,0 +1,16 @@
+{
+  "biome.sporebound.blighted_wilds": "Blighted Wilds",
+  "item.sporebound.rift_talisman": "Rift Talisman",
+  "biome.sporebound.drowned_hollows": "Drowned Hollows",
+  "biome.sporebound.ribbed_highlands": "Ribbed Highlands",
+  "tooltip.sporebound.rift_talisman.enter": "Use on a Rift Cairn. Entry costs one ender pearl.",
+  "tooltip.sporebound.rift_talisman.return": "In the Blighted World: use anywhere to return freely.",
+  "message.sporebound.instructions": "Activate the amethyst center of a Rift Cairn with this talisman.",
+  "message.sporebound.incomplete": "Rift Cairn: amethyst center, crying obsidian edges, polished deepslate corners; clear three blocks above.",
+  "message.sporebound.sanctuary": "Mushroom sanctuaries reject the rift. Build your cairn elsewhere.",
+  "message.sporebound.pearl": "Carry an ender pearl to open the rift. Returning is free.",
+  "message.sporebound.arrived": "The Blighted World. Use your talisman to return, or touch the cairn center with an empty hand.",
+  "message.sporebound.unavailable": "The Blighted World is unavailable.",
+  "message.sporebound.obstructed": "No safe landing was found. Clear space around the destination cairn or world spawn.",
+  "biome.sporebound.remnant_grove": "Remnant Grove"
+}

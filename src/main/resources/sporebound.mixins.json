@@ -1,0 +1,26 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "dev.sporebound.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "LevelChunkMixin",
+    "WorldGenRegionMixin",
+    "StructureMixin",
+    "SporeBiomeMixin",
+    "SporeInfectionMixin",
+    "StructureManagerAccessor",
+    "BlockTickMixin",
+    "BlockEntityTickMixin",
+    "TemplateManagerMixin",
+    "TemplateMixin",
+    "HiveAdmissionMixin",
+    "HiveRemovalMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "client": [
+    "CivilisHudMixin"
+  ]
+}

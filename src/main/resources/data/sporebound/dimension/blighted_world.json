@@ -1,0 +1,132 @@
+{
+  "type": "sporebound:blighted_world",
+  "generator": {
+    "type": "minecraft:noise",
+    "settings": "sporebound:blighted_world",
+    "biome_source": {
+      "type": "minecraft:multi_noise",
+      "biomes": [
+        {
+          "biome": "sporebound:drowned_hollows",
+          "parameters": {
+            "temperature": [
+              -2,
+              2
+            ],
+            "humidity": [
+              -0.1,
+              2
+            ],
+            "erosion": [
+              -2,
+              2
+            ],
+            "depth": [
+              -2,
+              2
+            ],
+            "weirdness": [
+              -2,
+              2
+            ],
+            "continentalness": [
+              -2,
+              -0.16
+            ],
+            "offset": 0
+          }
+        },
+        {
+          "biome": "sporebound:blighted_wilds",
+          "parameters": {
+            "temperature": [
+              -2,
+              2
+            ],
+            "humidity": [
+              -0.1,
+              2
+            ],
+            "erosion": [
+              -2,
+              2
+            ],
+            "depth": [
+              -2,
+              2
+            ],
+            "weirdness": [
+              -2,
+              2
+            ],
+            "continentalness": [
+              -0.16,
+              0.22
+            ],
+            "offset": 0
+          }
+        },
+        {
+          "biome": "sporebound:ribbed_highlands",
+          "parameters": {
+            "temperature": [
+              -2,
+              2
+            ],
+            "humidity": [
+              -0.1,
+              2
+            ],
+            "erosion": [
+              -2,
+              2
+            ],
+            "depth": [
+              -2,
+              2
+            ],
+            "weirdness": [
+              -2,
+              2
+            ],
+            "continentalness": [
+              0.22,
+              2
+            ],
+            "offset": 0
+          }
+        },
+        {
+          "biome": "sporebound:remnant_grove",
+          "parameters": {
+            "temperature": [
+              -2,
+              2
+            ],
+            "continentalness": [
+              -2,
+              2
+            ],
+            "erosion": [
+              -2,
+              2
+            ],
+            "depth": [
+              -2,
+              2
+            ],
+            "weirdness": [
+              -2,
+              2
+            ],
+            "humidity": [
+              -2,
+              -0.1
+            ],
+            "offset": 0
+          }
+        }
+      ]
+    }
+  }
+}
