@@ -58,4 +58,11 @@ jobs:
           cat > RELEASE_NOTES.md <<'NOTES'
           Terrain and atmosphere update for Minecraft 1.21.1 / NeoForge 21.1.249 / Java 21. Requires Spore 2.2.0j on both server and clients. Adds sediment seabeds, terrain-aware ruins, villages, a compact toggleable corruption HUD, spore fog/exposure, and new Rift Talisman artwork. Generation fixes affect new chunks; existing terrain is not rebuilt. Build, server/restart checks, and the real-client acceptance test must all pass before this release is published.
           NOTES
-          gh release create 'v0.3.0-dev' 'sporebound-0.3.0-dev.jar' 'sporebound-0.3.0-dev.jar.sha256' --target "$GITHUB_SHA" --title 'Sporebound 0.3.0 development' --notes-file RELEASE_NOTES.md --prerelease
+          if gh release view 'v0.3.0-dev' >/dev/null 2>&1; then
+            mkdir existing
+            gh release download 'v0.3.0-dev' --pattern 'sporebound-0.3.0-dev.jar.sha256' --dir existing
+            cmp 'sporebound-0.3.0-dev.jar.sha256' 'existing/sporebound-0.3.0-dev.jar.sha256'
+            echo 'Existing release contains the identical validated JAR; preserving it.'
+          else
+            gh release create 'v0.3.0-dev' 'sporebound-0.3.0-dev.jar' 'sporebound-0.3.0-dev.jar.sha256' --target "$GITHUB_SHA" --title 'Sporebound 0.3.0 development' --notes-file RELEASE_NOTES.md --prerelease
+          fi

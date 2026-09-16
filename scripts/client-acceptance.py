@@ -18,7 +18,7 @@ if args.compat:
     jars=list((root/'compatibility/mods').glob('*.jar'))
     if len(jars)!=2:raise SystemExit('The two exact compatibility JARs are required.')
     for jar in jars:shutil.copy2(jar,run/'mods'/jar.name)
-(run/'options.txt').write_text('tutorialStep:none\npauseOnLostFocus:false\nguiScale:2\nrenderDistance:6\nsimulationDistance:4\nmaxFps:30\nautoJump:false\n')
+(run/'options.txt').write_text('tutorialStep:none\npauseOnLostFocus:false\nguiScale:2\nrenderDistance:6\nsimulationDistance:5\nmaxFps:30\nautoJump:false\n')
 env=dict(os.environ,LIBGL_ALWAYS_SOFTWARE='1')
 log=root/'client-validation.log'
 timed_out=False
