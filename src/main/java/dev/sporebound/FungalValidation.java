@@ -103,7 +103,8 @@ public final class FungalValidation {
         var found=level.getEntitiesOfClass(InfectedBiomass.class,new net.minecraft.world.phys.AABB(new BlockPos(176,240,176)).inflate(8),
             b -> b.origin().equals("sporebound:restart_fixture"));
         check.accept(found.size()==1 && found.getFirst().mass()==5 && !found.getFirst().absorbing(),
-            "biomass mass and origin survive a full server restart");
+            "biomass mass and origin survive a full server restart; found=" + found.stream()
+                .map(b -> b.mass() + ":" + b.origin() + ":" + b.position()).toList());
     }
     private static InfectedBiomass create(ServerLevel level,BlockPos pos) {
         var b=FungalContent.BIOMASS.get().create(level);b.moveTo(pos.getX(),pos.getY(),pos.getZ());b.setNoAi(true);

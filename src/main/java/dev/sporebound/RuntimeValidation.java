@@ -34,6 +34,7 @@ public final class RuntimeValidation {
         for(var level:event.getServer().getAllLevels())level.getGameRules().getRule(GameRules.RULE_DOMOBSPAWNING).set(false,event.getServer());
         var blight=event.getServer().getLevel(Sporebound.BLIGHT);
         require(blight!=null,"dimension exists");
+        blight.setChunkForced(176>>4,176>>4,true);
         blight.getChunk(176>>4,176>>4);
         for(var site:FoundingHives.SITES)blight.getChunk(site[0]>>4,site[1]>>4);
     }
