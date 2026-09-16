@@ -96,7 +96,7 @@ public final class WorldRules {
         if (time % 20 == 0) {
             double index = CorruptionData.get(level).index();
             for (Entity entity : level.getAllEntities()) if (entity instanceof LivingEntity living && Protection.spore(entity)) scale(living, RegionalCorruption.at(level,living.blockPosition()));
-            for (ServerPlayer player : level.players()) sync(player);
+            for (ServerPlayer player : level.players()) { sync(player); SporeExposure.tick(player); }
         }
     }
     @SubscribeEvent public void explosion(ExplosionEvent.Detonate event) {

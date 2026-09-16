@@ -72,8 +72,8 @@ regional modifiers**. Local pressure scales mob health/damage as they move, and
 Remnant Groves prevent natural Spore spawning until their local index reaches 5
 (world index 9). No Spore foliage or structure starts generate in groves, although
 infection and creatures can invade from adjacent corrupted regions. Regional values
-are deterministic modifiers, not separate saved population counters. The HUD shows
-both `World` and `Local` values and the current region.
+are deterministic modifiers, not separate saved population counters. The compact HUD shows world pressure as a continuous bar and local pressure as a
+small notch. F3 reveals exact values and the current region.
 
 A new corrupted world starts with **one founding Hive Mind** near (512, 0), at
 world index 6. Its founding slot is saved once; killing it does not respawn it.
@@ -100,8 +100,27 @@ where applicable, alongside its original label. Its HUD enable/cooldown/layout
 settings and civilization scores, towns, shrines and spawn policies are retained.
 Dormant ordinary dimensions keep the original Civillis labels.
 
-The upper-left HUD includes original pixel-drawn fungal art, a segmented bar, a
-numerical index and a state label. Mushroom islands show `MUSHROOM SANCTUARY`.
+The upper-left HUD is a short continuous strip: grass and tiny flowers mark the
+healthy end; branching veins, mushrooms and watching eyes mark corruption. A second
+eye opens at local index 8. It is on by default. Every player can use
+`/sporebound hud on`, `/sporebound hud off`, or `/sporebound hud toggle` without OP.
+The setting is saved locally in `config/sporebound-client.toml` and survives restarts.
+F3 shows the world/local numbers, region, and mushroom sanctuary status. Hiding the
+bar does not change corruption or fog gameplay.
+
+In the Blighted World, local pressure above 2 gradually thickens an olive spore
+haze and adds drifting spores. Groves stay clearer than corrupted regions. Water,
+lava, blindness and darkness retain their own fog. At local index 8 or more, ten
+seconds outdoors in survival causes Weakness I, refreshed while exposed. A solid
+roof or leaving the hazard resets exposure; the weakness wears off within three
+seconds. Creative and spectator players are exempt. Negative/zero indices have
+no spore haze or exposure.
+
+Submerged surfaces use sediment (sand, gravel, mud and clay) instead of grass or
+mycelium. Spore ruins require dry, sufficiently even terrain across all their
+pieces, with terrain blending at the foundations. Plains villages can generate in
+Remnant Groves and Blighted Wilds. These generation changes apply to new chunks;
+existing underwater turf and damaged structures are not automatically rebuilt.
 
 | Index | Behavior |
 | --- | --- |
@@ -125,7 +144,8 @@ modifiers are updated rather than stacked. Changes preserve current health fract
 
 ## Operator commands
 
-Permission level 2 is required for all commands:
+Permission level 2 is required for the following server commands (the local HUD
+commands above do not require OP):
 
 ```text
 /sporebound get

@@ -12,5 +12,8 @@
   "message.sporebound.arrived": "The Blighted World. Use your talisman to return, or touch the cairn center with an empty hand.",
   "message.sporebound.unavailable": "The Blighted World is unavailable.",
   "message.sporebound.obstructed": "No safe landing was found. Clear space around the destination cairn or world spawn.",
-  "biome.sporebound.remnant_grove": "Remnant Grove"
+  "biome.sporebound.remnant_grove": "Remnant Grove",
+  "message.sporebound.hud_on": "Corruption bar on.",
+  "message.sporebound.hud_off": "Corruption bar off.",
+  "tooltip.sporebound.rift_talisman.lore": "A watching eye, listening for the world beyond."
 }

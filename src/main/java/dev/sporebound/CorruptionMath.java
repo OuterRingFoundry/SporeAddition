@@ -14,6 +14,8 @@ public final class CorruptionMath {
         // At 100 basic infected: +0.02 per active minute; capped at +0.10/minute.
         return Math.min(10, index + Math.min(0.10, weightedPopulation * 0.0002) * elapsedTicks / 1200.0);
     }
+    public static double fogDensity(double localIndex) { return Math.clamp((localIndex-2)/8,0,1); }
+    public static boolean hazardousFog(double localIndex) { return localIndex>=8; }
     public static int hiveLimit(double index) { return index<5?0:index<6?1:index<7?2:index<8?3:Integer.MAX_VALUE; }
     public static double regional(double dimensionIndex,double offset) { return dimensionIndex<=0?dimensionIndex:Math.clamp(dimensionIndex+offset,0,10); }
     public static boolean allowsBoss(double index) { return index >= 5; }

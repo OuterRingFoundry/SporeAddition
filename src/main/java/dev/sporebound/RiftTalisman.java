@@ -15,7 +15,7 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 
 public final class RiftTalisman extends Item {
-    public RiftTalisman() { super(new Properties().stacksTo(1)); }
+    public RiftTalisman() { super(new Properties().stacksTo(1).rarity(net.minecraft.world.item.Rarity.RARE)); }
     @Override public InteractionResult useOn(UseOnContext context) {
         if(context.getPlayer() instanceof ServerPlayer player) {
             if(player.level().dimension().equals(Sporebound.BLIGHT))recall(player);
@@ -34,6 +34,7 @@ public final class RiftTalisman extends Item {
         if(!player.getCooldowns().isOnCooldown(this)&&Travel.leave(player))player.getCooldowns().addCooldown(this,100);
     }
     @Override public void appendHoverText(ItemStack stack,TooltipContext context,List<Component> lines,TooltipFlag flag) {
+        lines.add(Component.translatable("tooltip.sporebound.rift_talisman.lore").withStyle(ChatFormatting.LIGHT_PURPLE, ChatFormatting.ITALIC));
         lines.add(Component.translatable("tooltip.sporebound.rift_talisman.enter").withStyle(ChatFormatting.GRAY));
         lines.add(Component.translatable("tooltip.sporebound.rift_talisman.return").withStyle(ChatFormatting.DARK_AQUA));
     }

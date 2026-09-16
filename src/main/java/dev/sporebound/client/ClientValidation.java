@@ -46,6 +46,16 @@ public final class ClientValidation {
             });
         }
         if(ticks==80){check(CorruptionPayload.ClientState.current!=null&&CorruptionPayload.ClientState.current.index()==-1,"dormant HUD synchronized");shot("01-dormant.png");mc.gameMode.useItem(mc.player,InteractionHand.MAIN_HAND);}
+        if(ticks==82) {
+            check(ClientPreferences.HUD.get(),"corruption bar defaults on");
+            check(net.neoforged.neoforge.client.ClientCommandHandler.runCommand("sporebound hud off"),"HUD off is a client command");
+            check(!ClientPreferences.HUD.get(),"HUD off changes saved local preference");
+        }
+        if(ticks==85)shot("07-hud-off.png");
+        if(ticks==87) {
+            check(net.neoforged.neoforge.client.ClientCommandHandler.runCommand("sporebound hud on"),"HUD on is a client command");
+            check(ClientPreferences.HUD.get(),"HUD on restores compact bar");
+        }
         if(ticks==90)check(!mc.level.dimension().equals(Sporebound.BLIGHT),"air use cannot bypass the ritual");
         if(ticks==100)click(departure);
         if(ticks==120){check(!mc.level.dimension().equals(Sporebound.BLIGHT),"incomplete cairn rejects entry");mc.getSingleplayerServer().execute(()->mc.getSingleplayerServer().overworld().setBlock(departure.east(),Blocks.CRYING_OBSIDIAN.defaultBlockState(),3));}
@@ -71,10 +81,25 @@ public final class ClientValidation {
                 server.overworld().setBlock(departure.offset(2,2,0),Blocks.STONE.defaultBlockState(),3);
             });
         }
-        if(ticks==375)validateCivilis();
+        if(ticks==375) {
+            validateCivilis();
+            var camera=mc.gameRenderer.getMainCamera();
+            var fog=new net.neoforged.neoforge.client.event.ViewportEvent.RenderFog(
+                net.minecraft.client.renderer.FogRenderer.FogMode.FOG_TERRAIN,
+                net.minecraft.world.level.material.FogType.NONE,camera,0,120,160,
+                com.mojang.blaze3d.shaders.FogShape.SPHERE);
+            SporeFog.distance(fog);
+            check(fog.isCanceled()&&fog.getFarPlaneDistance()<160,"corruption shortens real client fog distance");
+        }
         if(ticks==380){check(CorruptionPayload.ClientState.current.index()==10,"live index update reaches client");shot("03-overrun.png");}
         if(ticks==400)mc.gameMode.useItem(mc.player,InteractionHand.MAIN_HAND);
         if(ticks==460){
+            var fog=new net.neoforged.neoforge.client.event.ViewportEvent.RenderFog(
+                net.minecraft.client.renderer.FogRenderer.FogMode.FOG_TERRAIN,
+                net.minecraft.world.level.material.FogType.NONE,mc.gameRenderer.getMainCamera(),0,120,160,
+                com.mojang.blaze3d.shaders.FogShape.SPHERE);
+            SporeFog.distance(fog);
+            check(!fog.isCanceled()&&fog.getFarPlaneDistance()==160,"spore fog resets outside the corrupted world");
             check(mc.level.dimension().equals(net.minecraft.world.level.Level.OVERWORLD),"talisman returns to original dimension");
             check(CorruptionPayload.ClientState.current.index()==-1,"return HUD clears previous dimension value");
             shot("04-return.png");
@@ -107,7 +132,7 @@ public final class ClientValidation {
             check(CorruptionPayload.ClientState.current.region().equals("Ribbed Highlands")&&CorruptionPayload.ClientState.current.regionalIndex()==8,"highland preview has regional pressure 8 at world index 6");shot("06-ribbed-highlands.png");
         }
         if(ticks==920){
-            try{Files.writeString(mc.gameDirectory.toPath().resolve("client-validation.json"),"{\"status\":\"passed\",\"checks\":"+checks+",\"screenshots\":6}\n");}catch(Exception error){throw new RuntimeException(error);}
+            try{Files.writeString(mc.gameDirectory.toPath().resolve("client-validation.json"),"{\"status\":\"passed\",\"checks\":"+checks+",\"screenshots\":7}\n");}catch(Exception error){throw new RuntimeException(error);}
             System.out.println("SPOREBOUND CLIENT ACCEPTANCE PASS");mc.stop();
         }
     }

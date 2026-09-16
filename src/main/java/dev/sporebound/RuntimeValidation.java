@@ -61,6 +61,8 @@ public final class RuntimeValidation {
         var overworld=server.overworld();var blight=server.getLevel(Sporebound.BLIGHT);
         for(var level:server.getAllLevels())require(CorruptionData.get(level).index()==(level==blight?6:-1),"default "+level.dimension().location());
         terrainAndCairn(blight,overworld);
+        waterAndVillages(blight);
+        exposure(blight);
         int founders=0;
         for(var entity:blight.getAllEntities())if(entity instanceof com.Harbinger.Spore.Sentities.Organoids.Proto)founders++;
         require(founders==1,"exactly one initial Hive Mind: "+founders);
@@ -170,6 +172,54 @@ public final class RuntimeValidation {
         reloaded.discard();require(census.count()==1,"removing a hive frees its slot");
         require(level.addFreshEntity(entity("spore:proto",level,pos)),"vacant slot accepts a new hive");
         set(level,5);require(census.count()==1,"index 5 keeps one hive");set(level,6);
+    }
+    private static void exposure(ServerLevel level) {
+        var player=net.neoforged.neoforge.common.util.FakePlayerFactory.get(level,
+            new com.mojang.authlib.GameProfile(UUID.fromString("30000000-0000-0000-0000-000000000003"),"spore-fog-test"));
+        var pos=new BlockPos(1024,250,1024);var chunk=level.getChunkAt(pos);
+        var highland=level.registryAccess().registryOrThrow(Registries.BIOME).getHolderOrThrow(
+            ResourceKey.create(Registries.BIOME,Sporebound.id("ribbed_highlands")));
+        chunk.fillBiomesFromNoise((x,y,z,sampler)->highland,level.getChunkSource().randomState().sampler());
+        for(int y=250;y<level.getMaxBuildHeight();y++)level.setBlock(new BlockPos(1024,y,1024),Blocks.AIR.defaultBlockState(),3);
+        player.moveTo(1024.5,250,1024.5,0,0);player.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
+        CorruptionData.get(level).set(6);
+        require(SporeExposure.hazardous(player),"local pressure 8 makes outdoor fog hazardous");
+        for(int i=0;i<9;i++)SporeExposure.tick(player);
+        require(!player.hasEffect(net.minecraft.world.effect.MobEffects.WEAKNESS),"short spore exposure has no debuff");
+        SporeExposure.tick(player);
+        require(player.hasEffect(net.minecraft.world.effect.MobEffects.WEAKNESS),"ten seconds of exposure gives weakness");
+        level.setBlock(pos.above(3),Blocks.STONE.defaultBlockState(),3);
+        require(!SporeExposure.hazardous(player),"solid roof shelters players from spore exposure");
+        SporeExposure.tick(player);player.removeAllEffects();
+        level.setBlock(pos.above(3),Blocks.AIR.defaultBlockState(),3);
+        SporeExposure.tick(player);
+        require(!player.hasEffect(net.minecraft.world.effect.MobEffects.WEAKNESS),"shelter resets accumulated exposure");
+        player.setGameMode(net.minecraft.world.level.GameType.CREATIVE);
+        require(!SporeExposure.hazardous(player),"creative players are immune to exposure");
+        player.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);CorruptionData.get(level).set(-2);
+        require(!SporeExposure.hazardous(player),"purged dimensions have no hazardous fog");
+        SporeExposure.tick(player);CorruptionData.get(level).set(6);
+    }
+    private static void waterAndVillages(ServerLevel level) {
+        var generator=level.getChunkSource().getGenerator();var random=level.getChunkSource().randomState();
+        int sampled=0;
+        for(int x=-768;x<=768&&sampled<32;x+=96)for(int z=-768;z<=768&&sampled<32;z+=96) {
+            int y=generator.getBaseHeight(x,z,net.minecraft.world.level.levelgen.Heightmap.Types.OCEAN_FLOOR_WG,level,random);
+            if(y>=generator.getSeaLevel()-2)continue;
+            level.getChunk(x>>4,z>>4);
+            int floor=level.getHeight(net.minecraft.world.level.levelgen.Heightmap.Types.OCEAN_FLOOR,x,z)-1;
+            var pos=new BlockPos(x,floor,z);
+            if(!level.getFluidState(pos.above()).is(net.minecraft.tags.FluidTags.WATER))continue;
+            var state=level.getBlockState(pos);
+            require(!state.is(Blocks.GRASS_BLOCK)&&!state.is(Blocks.MYCELIUM),"submerged floor is not living turf at "+pos);
+            sampled++;
+        }
+        require(sampled>=16,"sampled actual generated water bodies: "+sampled);
+        var structures=level.registryAccess().registryOrThrow(Registries.STRUCTURE);
+        var village=structures.get(ResourceLocation.parse("minecraft:village_plains"));
+        require(village.biomes().stream().anyMatch(b->b.is(Sporebound.id("remnant_grove"))),"villages allowed in remnant groves");
+        require(village.biomes().stream().anyMatch(b->b.is(Sporebound.id("blighted_wilds"))),"villages allowed in blighted wilds");
+        require(village.biomes().stream().anyMatch(b->b.is(net.minecraft.world.level.biome.Biomes.PLAINS)),"vanilla village biome tags preserved");
     }
     private static void terrainAndCairn(ServerLevel blight,ServerLevel overworld) {
         var generator=blight.getChunkSource().getGenerator();

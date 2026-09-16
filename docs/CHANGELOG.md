@@ -1,3 +1,18 @@
+# 0.3.0-dev — terrain and atmosphere update
+
+- Water-aware sediment surface rules in the Blighted World.
+- Whole-start Spore ruin terrain checks and dry-ground projection; supported rib feet.
+- Vanilla plains villages enabled in healthy groves and blighted wilds.
+- Compact continuous corruption strip with original meadow/fungal pixel artwork.
+- Persistent, non-OP `/sporebound hud on|off|toggle` client commands; on by default.
+- Regional spore fog and drifting spores; brief Weakness I after prolonged outdoor
+  exposure at local index 8+, with shelter and creative/spectator exemptions.
+- Original obsidian/bone/amethyst Rift Talisman artwork and handheld model.
+- New flooded-floor, village, exposure and real-client regression checks.
+
+Generation fixes affect new chunks. Validation results for this build are recorded
+separately from the historical 0.2 release below.
+
 # 0.2.0-dev
 
 - Rift Cairn ritual: reusable talisman, one pearl per survival entry, free recall,
