@@ -52,9 +52,14 @@ public final class CorruptionHud {
         // Regional pressure notch shares the same direction as the corruption fill.
         int local=x+width-(int)Math.round(width*Math.clamp(data.regionalIndex()/10,0,1));
         g.fill(local,y+6,local+1,y+8,0xFFE6DDB9);
+        g.drawString(mc.font, roman(data.sanctuary()?0:data.index()), x+width+12, y-2, 0xFFE6DDB9, true);
         if(mc.getDebugOverlay().showDebugScreen())g.drawString(mc.font,
             String.format(java.util.Locale.ROOT,"World %.2f  Local %.2f  %s",data.index(),data.regionalIndex(),
                 data.sanctuary()?"Mushroom sanctuary":data.region()),8,35,0xFFE6DDB9,true);
+    }
+    public static String roman(double index) {
+        if(index<0)return index==-2?"Purged":"Dormant";
+        return new String[]{"0","I","II","III","IV","V","VI","VII","VIII","IX","X"}[(int)Math.clamp(index,0,10)];
     }
     private static void flower(GuiGraphics g,int x,int y,int petal) {
         line(g,x,y+1,x-1,21,0xFF568C64);

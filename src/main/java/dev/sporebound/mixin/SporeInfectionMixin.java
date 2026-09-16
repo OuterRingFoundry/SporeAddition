@@ -10,6 +10,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class SporeInfectionMixin {
     @Inject(method="onEntityDeath",at=@At("HEAD"),cancellable=true)
     private static void sporebound$conversion(LivingDeathEvent event,CallbackInfo ci) {
-        if(event.getEntity().level() instanceof ServerLevel level && Protection.sterile(level,event.getEntity().blockPosition()))ci.cancel();
+        if(event.getEntity().level() instanceof ServerLevel level && Protection.sterile(level,event.getEntity().blockPosition())) { ci.cancel(); return; }
+        dev.sporebound.FungalEcology.prepareConversion(event);
+    }
+    @Inject(method="onEntityDeath",at=@At("TAIL"))
+    private static void sporebound$biomass(LivingDeathEvent event,CallbackInfo ci) {
+        dev.sporebound.FungalEcology.convertUnmatched(event);
     }
 }

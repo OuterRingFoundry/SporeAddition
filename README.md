@@ -5,6 +5,12 @@ It adds a corrupted Overworld-like dimension, per-dimension corruption, and perm
 Spore protection for Overworld mushroom islands. This is an independent addon, not
 an official Spore release.
 
+## Current development work
+
+Version 0.4 is being developed locally. It adds corrupted skies, Remnant Mycelial
+Crust, all-creature targeting, and animated Infected Biomass merging/feeding.
+It is not yet built or released. See [implementation and validation notes](docs/INFECTED_BIOMASS.md).
+
 ## Installation
 
 Download `sporebound-0.3.0-dev.jar` and its SHA-256 checksum from the

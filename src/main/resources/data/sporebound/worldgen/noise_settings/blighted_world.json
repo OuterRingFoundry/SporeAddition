@@ -184,7 +184,7 @@
                     "then_run": {
                       "type": "minecraft:block",
                       "result_state": {
-                        "Name": "minecraft:calcite"
+                        "Name": "sporebound:remnant_mycelium"
                       }
                     }
                   },

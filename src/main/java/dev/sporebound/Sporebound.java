@@ -19,7 +19,12 @@ public final class Sporebound {
     public static ResourceLocation id(String path) { return ResourceLocation.fromNamespaceAndPath(ID, path); }
     public Sporebound(IEventBus bus) {
         ITEMS.register(bus);FEATURES.register(bus);
+        FungalContent.register(bus);
+        NeoForge.EVENT_BUS.register(new FungalEcology());
+        NeoForge.EVENT_BUS.register(new FungalForaging());
         bus.addListener(CorruptionPayload::register);
+        bus.addListener((net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent event) ->
+            event.enqueueWork(FungalEcology::installTargetPolicy));
         bus.addListener((net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent event) -> {
             if (event.getTabKey().equals(net.minecraft.world.item.CreativeModeTabs.TOOLS_AND_UTILITIES)) event.accept(TALISMAN.get());
         });

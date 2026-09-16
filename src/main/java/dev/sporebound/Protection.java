@@ -18,10 +18,10 @@ import com.Harbinger.Spore.Sentities.BaseEntities.EvolvedInfected;
 public final class Protection {
     private Protection() {}
     public static boolean spore(Entity entity) {
-        return BuiltInRegistries.ENTITY_TYPE.getKey(entity.getType()).getNamespace().equals("spore");
+        return entity instanceof InfectedBiomass || BuiltInRegistries.ENTITY_TYPE.getKey(entity.getType()).getNamespace().equals("spore");
     }
     public static boolean spore(BlockState state) {
-        return BuiltInRegistries.BLOCK.getKey(state.getBlock()).getNamespace().equals("spore");
+        return state.is(FungalContent.CRUST.get()) || BuiltInRegistries.BLOCK.getKey(state.getBlock()).getNamespace().equals("spore");
     }
     public static boolean boss(Entity entity) { return entity instanceof Proto || entity instanceof Calamity || entity instanceof TrueCalamity; }
     public static boolean mushroom(Level level, BlockPos pos) {

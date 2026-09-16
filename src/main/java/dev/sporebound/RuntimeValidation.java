@@ -34,6 +34,7 @@ public final class RuntimeValidation {
         for(var level:event.getServer().getAllLevels())level.getGameRules().getRule(GameRules.RULE_DOMOBSPAWNING).set(false,event.getServer());
         var blight=event.getServer().getLevel(Sporebound.BLIGHT);
         require(blight!=null,"dimension exists");
+        blight.getChunk(176>>4,176>>4);
         for(var site:FoundingHives.SITES)blight.getChunk(site[0]>>4,site[1]>>4);
     }
     public static void tick(ServerTickEvent.Post event) {
@@ -63,6 +64,7 @@ public final class RuntimeValidation {
         terrainAndCairn(blight,overworld);
         waterAndVillages(blight);
         exposure(blight);
+        FungalValidation.run(blight, RuntimeValidation::require);
         int founders=0;
         for(var entity:blight.getAllEntities())if(entity instanceof com.Harbinger.Spore.Sentities.Organoids.Proto)founders++;
         require(founders==1,"exactly one initial Hive Mind: "+founders);
@@ -263,14 +265,15 @@ public final class RuntimeValidation {
             blight,generator,net.minecraft.util.RandomSource.create(913),ribOrigin),"calcified rib feature places in corrupted world");
         int calcite=0,light=0;
         for(var block:BlockPos.betweenClosed(ribOrigin.offset(-4,0,-4),ribOrigin.offset(4,14,4))) {
-            if(blight.getBlockState(block).is(Blocks.CALCITE))calcite++;
+            if(blight.getBlockState(block).is(FungalContent.CRUST.get()))calcite++;
             if(blight.getBlockState(block).is(Blocks.SHROOMLIGHT))light++;
         }
-        require(calcite>15&&light>0&&blight.getBlockState(ribOrigin.above(2)).isAir(),"ribs form an open arch with luminous tips");
+        require(calcite>15&&light>0&&blight.getBlockState(ribOrigin.above(2)).isAir(),"mycelial ribs form an open arch with luminous tips");
         require(!Sporebound.RIBS.get().place(net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration.INSTANCE,
             overworld,overworld.getChunkSource().getGenerator(),net.minecraft.util.RandomSource.create(913),center.above()),"rib feature refuses external dimensions");
     }
     private static void read(MinecraftServer server) {
+        FungalValidation.afterRestart(server.getLevel(Sporebound.BLIGHT),RuntimeValidation::require);
         require(CorruptionData.get(server.overworld()).index()==-2,"purge survives process restart");
         require(CorruptionData.get(server.getLevel(Level.NETHER)).index()==6.5,"Nether saved independently");
         require(CorruptionData.get(server.getLevel(Level.END)).index()==2.5,"fractional End index survives restart");

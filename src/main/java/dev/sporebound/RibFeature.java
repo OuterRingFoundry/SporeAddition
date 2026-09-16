@@ -6,7 +6,7 @@ import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext;
 import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration;
 
-/** Small calcite ribs with dark feet and luminous tips. Entire footprint stays within a 9x9 area. */
+/** Small mycelial remnant ribs with dark feet and luminous tips. Entire footprint stays within a 9x9 area. */
 public final class RibFeature extends Feature<NoneFeatureConfiguration> {
     public RibFeature(){super(NoneFeatureConfiguration.CODEC);}
     @Override public boolean place(FeaturePlaceContext<NoneFeatureConfiguration> context) {
@@ -28,7 +28,7 @@ public final class RibFeature extends Feature<NoneFeatureConfiguration> {
             }
         }
         for(var pos:positions)level.setBlock(pos,(pos.getY()<origin.getY()+2?Blocks.POLISHED_BASALT:
-            pos.getY()==origin.getY()+height?Blocks.SHROOMLIGHT:Blocks.CALCITE).defaultBlockState(),2);
+            pos.getY()==origin.getY()+height?Blocks.SHROOMLIGHT:FungalContent.CRUST.get()).defaultBlockState(),2);
         return true;
     }
 }

@@ -15,5 +15,8 @@
   "biome.sporebound.remnant_grove": "Remnant Grove",
   "message.sporebound.hud_on": "Corruption bar on.",
   "message.sporebound.hud_off": "Corruption bar off.",
-  "tooltip.sporebound.rift_talisman.lore": "A watching eye, listening for the world beyond."
+  "tooltip.sporebound.rift_talisman.lore": "A watching eye, listening for the world beyond.",
+  "block.sporebound.remnant_mycelium": "Remnant Mycelial Crust",
+  "entity.sporebound.infected_biomass": "Infected Biomass",
+  "item.sporebound.infected_biomass_spawn_egg": "Infected Biomass Spawn Egg"
 }
