@@ -176,14 +176,14 @@ public final class RuntimeValidation {
     private static void exposure(ServerLevel level) {
         var player=net.neoforged.neoforge.common.util.FakePlayerFactory.get(level,
             new com.mojang.authlib.GameProfile(UUID.fromString("30000000-0000-0000-0000-000000000003"),"spore-fog-test"));
-        var pos=new BlockPos(1024,250,1024);var chunk=level.getChunkAt(pos);
+        var pos=new BlockPos(1032,250,1032);var chunk=level.getChunkAt(pos);
         var highland=level.registryAccess().registryOrThrow(Registries.BIOME).getHolderOrThrow(
             ResourceKey.create(Registries.BIOME,Sporebound.id("ribbed_highlands")));
         chunk.fillBiomesFromNoise((x,y,z,sampler)->highland,level.getChunkSource().randomState().sampler());
-        for(int y=250;y<level.getMaxBuildHeight();y++)level.setBlock(new BlockPos(1024,y,1024),Blocks.AIR.defaultBlockState(),3);
-        player.moveTo(1024.5,250,1024.5,0,0);player.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
+        for(int y=250;y<level.getMaxBuildHeight();y++)level.setBlock(new BlockPos(pos.getX(),y,pos.getZ()),Blocks.AIR.defaultBlockState(),3);
+        player.moveTo(pos.getX()+0.5,pos.getY(),pos.getZ()+0.5,0,0);player.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
         CorruptionData.get(level).set(6);
-        require(SporeExposure.hazardous(player),"local pressure 8 makes outdoor fog hazardous");
+        require(SporeExposure.hazardous(player),"local pressure 8 makes outdoor fog hazardous (local="+RegionalCorruption.at(level,player.blockPosition())+", sky="+level.canSeeSky(player.blockPosition().above())+", alive="+player.isAlive()+")");
         for(int i=0;i<9;i++)SporeExposure.tick(player);
         require(!player.hasEffect(net.minecraft.world.effect.MobEffects.WEAKNESS),"short spore exposure has no debuff");
         SporeExposure.tick(player);

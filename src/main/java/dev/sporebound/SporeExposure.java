@@ -13,7 +13,9 @@ public final class SporeExposure {
             &&CorruptionMath.hazardousFog(RegionalCorruption.at(player.serverLevel(),player.blockPosition()))
             &&!player.isCreative()&&!player.isSpectator()&&player.isAlive()
             &&!player.isUnderWater()&&!player.isInLava()
-            &&player.level().canSeeSky(player.blockPosition().above());
+            &&player.getEyeY()>=player.level().getHeight(
+                net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
+                player.getBlockX(),player.getBlockZ());
     }
     /** Called once per second on the server, independently of the optional HUD. */
     public static void tick(ServerPlayer player) {
