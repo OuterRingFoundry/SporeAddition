@@ -36,7 +36,7 @@ with log.open('w') as out:
 text=log.read_text(errors='replace')
 if timed_out:print('Client acceptance exceeded its 600-second deadline; process group stopped.')
 assert not timed_out and process.returncode==0 and 'SPOREBOUND CLIENT ACCEPTANCE PASS' in text, '\n'.join(line for line in text.splitlines() if any(word in line for word in ['AssertionError', 'CHECK PASS', 'Caused by:', 'Exception']))+'\n'+text[-10000:]
-for name in ['01-dormant','02-blighted-world','03-overrun','04-return','05-remnant-grove','06-ribbed-highlands','07-hud-off']:
+for name in ['01-dormant','02-blighted-world','03-overrun','04-return','05-remnant-grove','06-ribbed-highlands','07-hud-off','08-fungal-remnants','09-biomass-absorption','10-biomass-integrated']:
     assert (run/'screenshots'/(name+'.png')).is_file(),name
 assert 'arrival is above bedrock and collision free' in text
 assert 'arrival has a solid landing surface' in text

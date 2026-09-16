@@ -50,7 +50,7 @@ public final class InfectedBiomass extends PathfinderMob {
         goalSelector.addGoal(5, new RandomLookAroundGoal(this));
     }
     @Override protected boolean shouldDespawnInPeaceful() { return true; }
-    @Override public boolean canBreatheUnderwater() { return true; }
+    @Override public boolean canDrownInFluidType(net.neoforged.neoforge.fluids.FluidType type) { return false; }
     @Override public boolean removeWhenFarAway(double distance) { return false; }
     @Override public boolean isAlliedTo(Entity entity) { return Protection.spore(entity) || super.isAlliedTo(entity); }
     @Override protected SoundEvent getHurtSound(DamageSource source) { return SoundEvents.SLIME_HURT_SMALL; }

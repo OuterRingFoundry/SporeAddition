@@ -180,8 +180,9 @@ public final class ClientValidation {
         if(ticks==900){
             check(CorruptionPayload.ClientState.current.region().equals("Ribbed Highlands")&&CorruptionPayload.ClientState.current.regionalIndex()==8,"highland preview has regional pressure 8 at world index 6");shot("06-ribbed-highlands.png");
         }
-        if(ticks==920){
-            try{Files.writeString(mc.gameDirectory.toPath().resolve("client-validation.json"),"{\"status\":\"passed\",\"checks\":"+checks+",\"screenshots\":7}\n");}catch(Exception error){throw new RuntimeException(error);}
+        if(ticks==920)FungalClientValidation.setup();
+        if(ticks>920 && FungalClientValidation.tick(ClientValidation::check,ClientValidation::shot)){
+            try{Files.writeString(mc.gameDirectory.toPath().resolve("client-validation.json"),"{\"status\":\"passed\",\"checks\":"+checks+",\"screenshots\":10}\n");}catch(Exception error){throw new RuntimeException(error);}
             System.out.println("SPOREBOUND CLIENT ACCEPTANCE PASS");mc.stop();
         }
     }
