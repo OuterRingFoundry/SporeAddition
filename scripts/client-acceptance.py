@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import argparse,gzip,json,os,pathlib,shutil,struct,subprocess
+import argparse,gzip,json,os,pathlib,shutil,signal,struct,subprocess
 root=pathlib.Path(__file__).resolve().parents[1]
 parser=argparse.ArgumentParser()
 parser.add_argument('--source',default='run-core-final/world',help='Completed acceptance world to copy; never modified')
@@ -21,10 +21,21 @@ if args.compat:
 (run/'options.txt').write_text('tutorialStep:none\npauseOnLostFocus:false\nguiScale:2\nrenderDistance:6\nsimulationDistance:4\nmaxFps:30\nautoJump:false\n')
 env=dict(os.environ,LIBGL_ALWAYS_SOFTWARE='1')
 log=root/'client-validation.log'
+timed_out=False
 with log.open('w') as out:
-    result=subprocess.run(['xvfb-run','-a','-s','-screen 0 1280x720x24','bash','gradlew','--no-daemon','runClient','-PclientValidation'],cwd=root,env=env,stdout=out,stderr=subprocess.STDOUT,timeout=600)
+    process=subprocess.Popen(['xvfb-run','-a','-s','-screen 0 1280x720x24','bash','gradlew','--no-daemon','runClient','-PclientValidation'],cwd=root,env=env,stdout=out,stderr=subprocess.STDOUT,start_new_session=True)
+    try:
+        process.wait(timeout=600)
+    except subprocess.TimeoutExpired:
+        timed_out=True
+        os.killpg(process.pid,signal.SIGTERM)
+        try:process.wait(timeout=10)
+        except subprocess.TimeoutExpired:
+            os.killpg(process.pid,signal.SIGKILL)
+            process.wait()
 text=log.read_text(errors='replace')
-assert result.returncode==0 and 'SPOREBOUND CLIENT ACCEPTANCE PASS' in text, '\n'.join(line for line in text.splitlines() if any(word in line for word in ['AssertionError', 'CHECK PASS', 'Caused by:', 'Exception']))+'\n'+text[-10000:]
+if timed_out:print('Client acceptance exceeded its 600-second deadline; process group stopped.')
+assert not timed_out and process.returncode==0 and 'SPOREBOUND CLIENT ACCEPTANCE PASS' in text, '\n'.join(line for line in text.splitlines() if any(word in line for word in ['AssertionError', 'CHECK PASS', 'Caused by:', 'Exception']))+'\n'+text[-10000:]
 for name in ['01-dormant','02-blighted-world','03-overrun','04-return','05-remnant-grove','06-ribbed-highlands','07-hud-off']:
     assert (run/'screenshots'/(name+'.png')).is_file(),name
 assert 'arrival is above bedrock and collision free' in text

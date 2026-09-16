@@ -26,7 +26,7 @@ public final class ClientValidation {
     private static volatile BlockPos departure,arrival;
     private static volatile boolean setupComplete,serverTravelReady;
     private static volatile long serverTicks;
-    private static long consumedServerTick;
+    private static long interactionServerTick;
     @SubscribeEvent public static void serverTick(net.neoforged.neoforge.event.tick.ServerTickEvent.Post event) {
         if(!Boolean.getBoolean("sporebound.clientValidation"))return;
         var players=event.getServer().getPlayerList().getPlayers();
@@ -42,10 +42,6 @@ public final class ClientValidation {
                 && button.getMessage().getString().equals("I know what I'm doing!")){button.onPress();break;}
         }
         if(mc.level==null||mc.player==null||mc.getSingleplayerServer()==null)return;
-        // Client ticks can outrun the integrated server during chunk generation.
-        // Pace the script by completed server ticks, including cooldown and packet work.
-        if(consumedServerTick==serverTicks)return;
-        consumedServerTick=serverTicks;
         ++ticks;
         // CI clients can outrun integrated-server world generation. Wait for the actual
         // synchronized state with a wall-clock deadline, instead of assuming 80 frames.
@@ -53,6 +49,7 @@ public final class ClientValidation {
         boolean ready=switch(ticks) {
             case 80 -> setupComplete && state!=null && state.index()==-1
                 && atCairn(departure) && holdingTalisman();
+            case 90,120,160 -> serverTicks-interactionServerTick>=10;
             case 100 -> atCairn(departure) && holdingTalisman();
             case 140 -> atCairn(departure) && holdingTalisman()
                 && RiftCairn.complete(mc.level,departure);
@@ -97,7 +94,7 @@ public final class ClientValidation {
                 CorruptionData.get(level).set(-1);WorldRules.sync(player);setupComplete=true;
             });
         }
-        if(ticks==80){check(CorruptionPayload.ClientState.current!=null&&CorruptionPayload.ClientState.current.index()==-1,"dormant HUD synchronized");shot("01-dormant.png");mc.gameMode.useItem(mc.player,InteractionHand.MAIN_HAND);}
+        if(ticks==80){check(CorruptionPayload.ClientState.current!=null&&CorruptionPayload.ClientState.current.index()==-1,"dormant HUD synchronized");shot("01-dormant.png");useTalisman();}
         if(ticks==82) {
             check(ClientPreferences.HUD.get(),"corruption bar defaults on");
             check(net.neoforged.neoforge.client.ClientCommandHandler.runCommand("sporebound hud off"),"HUD off is a client command");
@@ -144,7 +141,7 @@ public final class ClientValidation {
             check(fog.isCanceled()&&fog.getFarPlaneDistance()<160,"corruption shortens real client fog distance");
         }
         if(ticks==380){check(CorruptionPayload.ClientState.current.index()==10,"live index update reaches client");shot("03-overrun.png");}
-        if(ticks==400)mc.gameMode.useItem(mc.player,InteractionHand.MAIN_HAND);
+        if(ticks==400)useTalisman();
         if(ticks==460){
             var fog=new net.neoforged.neoforge.client.event.ViewportEvent.RenderFog(
                 net.minecraft.client.renderer.FogRenderer.FogMode.FOG_TERRAIN,
@@ -227,7 +224,11 @@ public final class ClientValidation {
         return pos!=null && mc.player.distanceToSqr(Vec3.atCenterOf(pos))<16
             && mc.level.getBlockState(pos).is(Blocks.AMETHYST_BLOCK);
     }
-    private static void click(BlockPos pos){var mc=Minecraft.getInstance();mc.gameMode.useItemOn(mc.player,InteractionHand.MAIN_HAND,new BlockHitResult(Vec3.atCenterOf(pos).add(0,0.5,0),Direction.UP,pos,false));}
+    private static void useTalisman() {
+        var mc=Minecraft.getInstance();interactionServerTick=serverTicks;
+        mc.gameMode.useItem(mc.player,InteractionHand.MAIN_HAND);
+    }
+    private static void click(BlockPos pos){var mc=Minecraft.getInstance();interactionServerTick=serverTicks;mc.gameMode.useItemOn(mc.player,InteractionHand.MAIN_HAND,new BlockHitResult(Vec3.atCenterOf(pos).add(0,0.5,0),Direction.UP,pos,false));}
     private static synchronized void check(boolean ok,String what){if(!ok)throw new AssertionError(what);checks++;System.out.println("SPOREBOUND CLIENT CHECK PASS: "+what);}
     private static void shot(String name){var mc=Minecraft.getInstance();Screenshot.grab(mc.gameDirectory,name,mc.getMainRenderTarget(),message->System.out.println(message.getString()));}
 }

@@ -14,9 +14,9 @@ Minecraft 1.21.1 / Java 21 / NeoForge 21.1.249 / Spore 2.2.0j.
   HUD off/on, fog, cairn entry and return, grove and highland previews.
 - GitHub client validation initially exposed asynchronous fixture setup: actions
   could be sent before client position, inventory and blocks were synchronized.
-  The harness now paces actions by completed integrated-server ticks and waits for
+  The harness now waits for server ticks after rejection probes and waits for
   these prerequisites plus both server/client cooldowns with bounded timeouts;
-  failures include position and inventory diagnostics. Final CI status is recorded
+  failures include position and inventory diagnostics, including on process timeout. Final CI status is recorded
   in the release workflow; publication is gated on a passing real-client run.
 
 ConcentricWorld's separate fixture verifies all ten capital buildings, references
