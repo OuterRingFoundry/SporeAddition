@@ -154,6 +154,8 @@ public final class RuntimeValidation {
         require(nether.addFreshEntity(entity("spore:proto",nether,new BlockPos(10,120,8))),"independent Nether census accepts second hive");
         require(HivePopulation.get(nether).count()==2,"two Nether hives saved for restart");
         if(mode.startsWith("compat"))compatibility(server);
+        // The earlier purge test correctly removes all Spore allies, including biomass.
+        FungalValidation.prepareRestart(blight);
     }
     private static void hiveCaps(ServerLevel level) {
         var pos=new BlockPos(512,130,0);var census=HivePopulation.get(level);

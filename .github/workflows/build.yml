@@ -20,12 +20,15 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -y xvfb libgl1-mesa-dri libglx-mesa0 libopenal1
           python3 scripts/client-acceptance.py --source run-ci-core/world
+      - name: Checksum validated build
+        run: sha256sum build/libs/sporebound-0.4.0-dev.jar > build/libs/sporebound-0.4.0-dev.jar.sha256
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: sporebound-development
           path: |
             build/libs/*.jar
+            build/libs/*.sha256
             build/reports/
             run-ci-core-*.log
             client-validation.log
