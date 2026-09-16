@@ -7,16 +7,20 @@ an official Spore release.
 
 ## Installation
 
+Download `sporebound-0.3.0-dev.jar` and its SHA-256 checksum from the
+[0.3.0 development release](https://github.com/OuterRingFoundry/SporeAddition/releases/tag/v0.3.0-dev).
+
+
 Use Java 21, NeoForge **21.1.249**, and [**Spore 2.2.0j for NeoForge 1.21.1**](https://www.curseforge.com/minecraft/mc-mods/fungal-infection-spore/files/8342823)
 (CurseForge file 8342823). Install Sporebound and Spore on both server and clients.
 The addon deliberately pins this Spore version because it hooks infection internals.
 Spore remains an external dependency; none of its JAR, textures, sounds or structures
 are bundled into this mod.
 
-Optional compatibility targets: ConcentricWorld 0.31.0 integration build and
+Optional compatibility targets: ConcentricWorld 0.31.1 structure-fix build and
 Civillis 2.0.1-release. See `compatibility/` for precise artifact identities.
 
-Version 0.2 changes only newly generated terrain; old chunks retain their previous landscape.
+Versions 0.2 and 0.3 change only newly generated terrain; old chunks retain their previous landscape.
 Upgrading from 0.1 performs a one-time census of stored Hive Mind entities without
 loading their chunks. Existing founders are subject to the new population caps.
 

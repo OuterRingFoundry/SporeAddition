@@ -31,3 +31,31 @@ jobs:
             client-validation.log
             run-client/client-validation.json
             run-client/screenshots/
+
+  publish:
+    needs: validate
+    if: github.event_name == 'push' && github.ref == 'refs/heads/fix/worldgen-hud-spore-fog'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: sporebound-development
+          path: verified
+      - name: Publish verified sporebound-0.3.0-dev.jar and checksum
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          mkdir release
+          mapfile -t jars < <(find verified -type f -name 'sporebound-0.3.0-dev.jar')
+          test "${#jars[@]}" -eq 1
+          cp "${jars[0]}" release/
+          cd release
+          sha256sum 'sporebound-0.3.0-dev.jar' > 'sporebound-0.3.0-dev.jar.sha256'
+          cat > RELEASE_NOTES.md <<'NOTES'
+          Terrain and atmosphere update for Minecraft 1.21.1 / NeoForge 21.1.249 / Java 21. Requires Spore 2.2.0j on both server and clients. Adds sediment seabeds, terrain-aware ruins, villages, a compact toggleable corruption HUD, spore fog/exposure, and new Rift Talisman artwork. Generation fixes affect new chunks; existing terrain is not rebuilt. Build, server/restart checks, and the real-client acceptance test must all pass before this release is published.
+          NOTES
+          gh release create 'v0.3.0-dev' 'sporebound-0.3.0-dev.jar' 'sporebound-0.3.0-dev.jar.sha256' --target "$GITHUB_SHA" --title 'Sporebound 0.3.0 development' --notes-file RELEASE_NOTES.md --prerelease

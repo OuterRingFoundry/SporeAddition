@@ -24,7 +24,16 @@ public final class ClientValidation {
     private static int ticks,checks;
     private static long waitingSince;
     private static volatile BlockPos departure,arrival;
-    private static volatile boolean setupComplete;
+    private static volatile boolean setupComplete,serverTravelReady;
+    private static volatile long serverTicks;
+    private static long consumedServerTick;
+    @SubscribeEvent public static void serverTick(net.neoforged.neoforge.event.tick.ServerTickEvent.Post event) {
+        if(!Boolean.getBoolean("sporebound.clientValidation"))return;
+        var players=event.getServer().getPlayerList().getPlayers();
+        serverTravelReady=!players.isEmpty()
+            && !players.getFirst().getCooldowns().isOnCooldown(Sporebound.TALISMAN.get());
+        ++serverTicks;
+    }
     @SubscribeEvent public static void tick(ClientTickEvent.Post event) {
         if(!Boolean.getBoolean("sporebound.clientValidation"))return;
         var mc=Minecraft.getInstance();
@@ -33,6 +42,10 @@ public final class ClientValidation {
                 && button.getMessage().getString().equals("I know what I'm doing!")){button.onPress();break;}
         }
         if(mc.level==null||mc.player==null||mc.getSingleplayerServer()==null)return;
+        // Client ticks can outrun the integrated server during chunk generation.
+        // Pace the script by completed server ticks, including cooldown and packet work.
+        if(consumedServerTick==serverTicks)return;
+        consumedServerTick=serverTicks;
         ++ticks;
         // CI clients can outrun integrated-server world generation. Wait for the actual
         // synchronized state with a wall-clock deadline, instead of assuming 80 frames.
@@ -46,17 +59,17 @@ public final class ClientValidation {
             case 180 -> atCairn(departure) && holdingTalisman()
                 && RiftCairn.complete(mc.level,departure)
                 && mc.player.getInventory().countItem(Items.ENDER_PEARL)==2;
-            case 400 -> holdingTalisman() && !mc.player.getCooldowns().isOnCooldown(Sporebound.TALISMAN.get());
+            case 400 -> holdingTalisman() && serverTravelReady && !mc.player.getCooldowns().isOnCooldown(Sporebound.TALISMAN.get());
             case 520 -> atCairn(departure) && holdingTalisman()
                 && mc.player.getInventory().countItem(Items.ENDER_PEARL)==1
-                && !mc.player.getCooldowns().isOnCooldown(Sporebound.TALISMAN.get());
+                && serverTravelReady && !mc.player.getCooldowns().isOnCooldown(Sporebound.TALISMAN.get());
             case 280,320,610 -> mc.level.dimension().equals(Sporebound.BLIGHT)
                 && state!=null && state.dimension().equals(Sporebound.BLIGHT.location()) && state.index()>=6;
             case 375 -> state!=null && state.index()==10;
             case 460,700 -> mc.level.dimension().equals(net.minecraft.world.level.Level.OVERWORLD)
                 && state!=null && state.index()==-1;
             case 640 -> atCairn(arrival) && mc.player.getMainHandItem().isEmpty()
-                && !mc.player.getCooldowns().isOnCooldown(Sporebound.TALISMAN.get());
+                && serverTravelReady && !mc.player.getCooldowns().isOnCooldown(Sporebound.TALISMAN.get());
             case 800 -> state!=null && state.region().equals("Remnant Grove") && state.regionalIndex()==2;
             case 900 -> state!=null && state.region().equals("Ribbed Highlands") && state.regionalIndex()==8;
             default -> true;
@@ -67,7 +80,7 @@ public final class ClientValidation {
                 throw new AssertionError("Timed out waiting for client stage "+ticks+": "+state
                     +"; position="+mc.player.position()+"; hand="+mc.player.getMainHandItem()
                     +"; pearls="+mc.player.getInventory().countItem(Items.ENDER_PEARL)
-                    +"; departure="+departure+"; setup="+setupComplete);
+                    +"; departure="+departure+"; setup="+setupComplete+"; serverTravelReady="+serverTravelReady);
             --ticks;return;
         }
         waitingSince=0;
