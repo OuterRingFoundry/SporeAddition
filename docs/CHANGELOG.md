@@ -1,3 +1,16 @@
+# 0.4.0-dev — fungal remnants
+
+- Corruption-dependent rose/mauve sky and discolored clouds.
+- Original Remnant Mycelial Crust replaces generated calcite surface/rib blocks.
+- Spore targets all eligible creature types; existing fungal counterparts persist.
+- Unmatched infected creatures become mobile Infected Biomass on death.
+- Animated biomass coalescence, eight-unit evolution, and nonviolent hungry feeding.
+- Roman-numeral corruption HUD, edible-loot digestion, and crop/farmland foraging.
+- Build, 155 fresh-world checks, 11 restart checks, and real-client acceptance pass.
+
+See [0.4 verification and limitations](INFECTED_BIOMASS.md). New terrain changes
+apply to newly generated chunks. This is a validated feature-branch artifact.
+
 # 0.3.0-dev — terrain and atmosphere update
 
 - Water-aware sediment surface rules in the Blighted World.

@@ -1,3 +1,12 @@
+# Version 0.4 verification — 2026-09-16
+
+Source `c6968575208dad1f33210e51835ee7e18b677554` passed clean check/build,
+155 fresh-world checks, 11 full-process restart checks, and real-client acceptance.
+[CI evidence and artifact](https://github.com/OuterRingFoundry/SporeAddition/actions/runs/35113467666).
+See [fungal-remnant validation details](INFECTED_BIOMASS.md) for new coverage and
+limits. The compatibility and release evidence below is historical and does not
+certify the 0.4 build with optional mods or two independent players.
+
 # 0.3.0 development update — 2026-09-16
 
 Artifact: `sporebound-0.3.0-dev.jar`. The GitHub release supplies its SHA-256 checksum.

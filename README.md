@@ -7,9 +7,12 @@ an official Spore release.
 
 ## Current development work
 
-Version 0.4 is being developed locally. It adds corrupted skies, Remnant Mycelial
-Crust, all-creature targeting, and animated Infected Biomass merging/feeding.
-It is not yet built or released. See [implementation and validation notes](docs/INFECTED_BIOMASS.md).
+Version 0.4 adds corrupted skies, Remnant Mycelial Crust, all-creature targeting,
+and animated Infected Biomass merging/feeding. Its build, server/restart checks,
+and real-client acceptance passed on `feat/infected-biomass`.
+[Download the validated development JAR and evidence](https://github.com/OuterRingFoundry/SporeAddition/actions/runs/35113467666/artifacts/10453014401).
+See [implementation and validation notes](docs/INFECTED_BIOMASS.md). The branch has
+not yet been merged or published as a release.
 
 ## Installation
 

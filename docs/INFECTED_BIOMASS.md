@@ -1,7 +1,8 @@
 # Sporebound 0.4 development: fungal remnants
 
-Status: implemented locally; compilation, server acceptance/restart, client rendering,
-and multiplayer validation are pending. This is not a published release.
+Status: uploaded and validated on `feat/infected-biomass`. Clean build, 155
+fresh-world checks, 11 restart checks, and real-client acceptance all passed.
+This is a development artifact; it has not been merged or published as a release.
 
 ## Player-facing changes
 
@@ -36,14 +37,22 @@ and multiplayer validation are pending. This is not a published release.
 
 ## Verification
 
-FungalValidation is integrated into the disposable core/compat acceptance fixture.
-It checks target acquisition, preserved native conversions, idempotence, canceled
-deaths, hunger gating, animation duration, nonviolent feeding, mass conservation,
-interruption, evolution, NBT and full-restart persistence, edible restrictions, and
-crop griefing controls. These new cases have NOT been run.
+Validated source: `c6968575208dad1f33210e51835ee7e18b677554`.
+[Passing CI run](https://github.com/OuterRingFoundry/SporeAddition/actions/runs/35113467666).
+[Download JAR, checksum, logs, and screenshots](https://github.com/OuterRingFoundry/SporeAddition/actions/runs/35113467666/artifacts/10453014401).
 
-The real-client fixture still needs explicit biomass/sky visual probes. Two-player
-synchronization must be checked against the final built artifact.
+The clean build and all core fixture checks pass: 155 on the fresh world and 11
+after a full process restart. Coverage includes target acquisition, preserved
+native conversions, idempotence, canceled deaths, hunger gating, animation duration,
+nonviolent feeding, mass conservation, interruption, evolution, entity NBT and
+full-restart persistence, edible restrictions, and crop griefing controls.
 
-Executed locally: resource JSON parsing and Java grammar parsing only.
-No successful 0.4 build or gameplay test is claimed.
+The real-client fixture passes sky/cloud differences, custom renderer and texture
+availability, synchronized mass, simultaneous merge/feeding animation state, and
+completed transfer/satiety. It captures ten screenshots, including fungal remnants,
+absorption, and integration. Existing ritual, containment, fog, and HUD tests pass.
+
+Local Java grammar and JSON checks also passed. Separate two-player sessions,
+long-running population balance, and the optional ConcentricWorld/Civillis
+compatibility suite have not been rerun for 0.4. The older compatibility results
+belong to their recorded versions. Terrain replacement applies to new generation.
