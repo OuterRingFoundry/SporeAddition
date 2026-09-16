@@ -14,8 +14,8 @@ public final class RibFeature extends Feature<NoneFeatureConfiguration> {
         if(!level.getLevel().dimension().equals(Sporebound.BLIGHT))return false;
         boolean alongX=context.random().nextBoolean();int height=8+context.random().nextInt(6);
         // Validate the entire arch before changing anything; preserve ruins and other features.
-        for(int side:new int[]{-1,1}) {
-            var foot=origin.offset(alongX?side*4:0,-1,alongX?0:side*4);
+        for(int side:new int[]{-1,1})for(int thick=0;thick<=1;thick++) {
+            var foot=origin.offset(alongX?side*4:thick,-1,alongX?thick:side*4);
             if(!level.getBlockState(foot).isSolid()||!level.getFluidState(foot).isEmpty())return false;
         }
         var positions=new java.util.ArrayList<BlockPos>();

@@ -9,9 +9,10 @@
     "sha256": "0cdb027eb53e6872bdb8de601dc52c176fcb6ddd33a0a2e20a66392937c3d5fe"
   },
   "concentricworld": {
-    "version": "0.31.0",
-    "filename": "concentricworld-0.31.0-neoforge-1.21.1.jar",
-    "sha256": "8722108d7259361746e66d696d450f196aa186a389370ec9e7c0c4c089fef1d1"
+    "version": "0.31.1-neoforge-1.21.1",
+    "filename": "concentricworld-0.31.1-neoforge-1.21.1.jar",
+    "sha256": "e857ef6758fc32c4cc451d0cae8ce3c6739025ba55f41a09fdf2249fba56d1ca",
+    "url": "https://github.com/OuterRingFoundry/ModDevConcWorld/releases/tag/v0.31.1-neoforge-1.21.1"
   },
   "civillis": {
     "version": "2.0.1-release",

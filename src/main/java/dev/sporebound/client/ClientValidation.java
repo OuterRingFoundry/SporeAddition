@@ -22,7 +22,18 @@ import net.neoforged.neoforge.client.event.ClientTickEvent;
 @EventBusSubscriber(modid=Sporebound.ID,value=Dist.CLIENT)
 public final class ClientValidation {
     private static int ticks,checks;
+    private static long waitingSince;
     private static volatile BlockPos departure,arrival;
+    private static volatile boolean setupComplete,serverTravelReady;
+    private static volatile long serverTicks;
+    private static long interactionServerTick;
+    @SubscribeEvent public static void serverTick(net.neoforged.neoforge.event.tick.ServerTickEvent.Post event) {
+        if(!Boolean.getBoolean("sporebound.clientValidation"))return;
+        var players=event.getServer().getPlayerList().getPlayers();
+        serverTravelReady=!players.isEmpty()
+            && !players.getFirst().getCooldowns().isOnCooldown(Sporebound.TALISMAN.get());
+        ++serverTicks;
+    }
     @SubscribeEvent public static void tick(ClientTickEvent.Post event) {
         if(!Boolean.getBoolean("sporebound.clientValidation"))return;
         var mc=Minecraft.getInstance();
@@ -32,6 +43,44 @@ public final class ClientValidation {
         }
         if(mc.level==null||mc.player==null||mc.getSingleplayerServer()==null)return;
         ++ticks;
+        // CI clients can outrun integrated-server world generation. Wait for the actual
+        // synchronized state with a wall-clock deadline, instead of assuming 80 frames.
+        var state=CorruptionPayload.ClientState.current;
+        boolean ready=switch(ticks) {
+            case 80 -> setupComplete && state!=null && state.index()==-1
+                && atCairn(departure) && holdingTalisman();
+            case 90,120,160 -> serverTicks-interactionServerTick>=10;
+            case 100 -> atCairn(departure) && holdingTalisman();
+            case 140 -> atCairn(departure) && holdingTalisman()
+                && RiftCairn.complete(mc.level,departure);
+            case 180 -> atCairn(departure) && holdingTalisman()
+                && RiftCairn.complete(mc.level,departure)
+                && mc.player.getInventory().countItem(Items.ENDER_PEARL)==2;
+            case 400 -> holdingTalisman() && serverTravelReady && !mc.player.getCooldowns().isOnCooldown(Sporebound.TALISMAN.get());
+            case 520 -> atCairn(departure) && holdingTalisman()
+                && mc.player.getInventory().countItem(Items.ENDER_PEARL)==1
+                && serverTravelReady && !mc.player.getCooldowns().isOnCooldown(Sporebound.TALISMAN.get());
+            case 280,320,610 -> mc.level.dimension().equals(Sporebound.BLIGHT)
+                && state!=null && state.dimension().equals(Sporebound.BLIGHT.location()) && state.index()>=6;
+            case 375 -> state!=null && state.index()==10;
+            case 460,700 -> mc.level.dimension().equals(net.minecraft.world.level.Level.OVERWORLD)
+                && state!=null && state.index()==-1;
+            case 640 -> atCairn(arrival) && mc.player.getMainHandItem().isEmpty()
+                && serverTravelReady && !mc.player.getCooldowns().isOnCooldown(Sporebound.TALISMAN.get());
+            case 800 -> state!=null && state.region().equals("Remnant Grove") && state.regionalIndex()==2;
+            case 900 -> state!=null && state.region().equals("Ribbed Highlands") && state.regionalIndex()==8;
+            default -> true;
+        };
+        if(!ready) {
+            if(waitingSince==0)waitingSince=System.nanoTime();
+            if(System.nanoTime()-waitingSince>120_000_000_000L)
+                throw new AssertionError("Timed out waiting for client stage "+ticks+": "+state
+                    +"; position="+mc.player.position()+"; hand="+mc.player.getMainHandItem()
+                    +"; pearls="+mc.player.getInventory().countItem(Items.ENDER_PEARL)
+                    +"; departure="+departure+"; setup="+setupComplete+"; serverTravelReady="+serverTravelReady);
+            --ticks;return;
+        }
+        waitingSince=0;
         if(ticks==1){mc.options.pauseOnLostFocus=false;mc.options.hideGui=false;mc.setScreen(null);
             mc.getSingleplayerServer().execute(()->{
                 var server=mc.getSingleplayerServer();var player=server.getPlayerList().getPlayers().getFirst();
@@ -42,10 +91,20 @@ public final class ClientValidation {
                 departure=new BlockPos(100,Math.max(160,level.getHeight(net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,100,100)+8),100);
                 RiftCairn.build(level,departure);level.setBlock(departure.east(),Blocks.AIR.defaultBlockState(),3);
                 player.teleportTo(level,departure.getX()+2.5,departure.getY()+1,departure.getZ()+0.5,Set.of(),90,35);
-                CorruptionData.get(level).set(-1);WorldRules.sync(player);
+                CorruptionData.get(level).set(-1);WorldRules.sync(player);setupComplete=true;
             });
         }
-        if(ticks==80){check(CorruptionPayload.ClientState.current!=null&&CorruptionPayload.ClientState.current.index()==-1,"dormant HUD synchronized");shot("01-dormant.png");mc.gameMode.useItem(mc.player,InteractionHand.MAIN_HAND);}
+        if(ticks==80){check(CorruptionPayload.ClientState.current!=null&&CorruptionPayload.ClientState.current.index()==-1,"dormant HUD synchronized");shot("01-dormant.png");useTalisman();}
+        if(ticks==82) {
+            check(ClientPreferences.HUD.get(),"corruption bar defaults on");
+            check(net.neoforged.neoforge.client.ClientCommandHandler.runCommand("sporebound hud off"),"HUD off is a client command");
+            check(!ClientPreferences.HUD.get(),"HUD off changes saved local preference");
+        }
+        if(ticks==85)shot("07-hud-off.png");
+        if(ticks==87) {
+            check(net.neoforged.neoforge.client.ClientCommandHandler.runCommand("sporebound hud on"),"HUD on is a client command");
+            check(ClientPreferences.HUD.get(),"HUD on restores compact bar");
+        }
         if(ticks==90)check(!mc.level.dimension().equals(Sporebound.BLIGHT),"air use cannot bypass the ritual");
         if(ticks==100)click(departure);
         if(ticks==120){check(!mc.level.dimension().equals(Sporebound.BLIGHT),"incomplete cairn rejects entry");mc.getSingleplayerServer().execute(()->mc.getSingleplayerServer().overworld().setBlock(departure.east(),Blocks.CRYING_OBSIDIAN.defaultBlockState(),3));}
@@ -71,10 +130,25 @@ public final class ClientValidation {
                 server.overworld().setBlock(departure.offset(2,2,0),Blocks.STONE.defaultBlockState(),3);
             });
         }
-        if(ticks==375)validateCivilis();
+        if(ticks==375) {
+            validateCivilis();
+            var camera=mc.gameRenderer.getMainCamera();
+            var fog=new net.neoforged.neoforge.client.event.ViewportEvent.RenderFog(
+                net.minecraft.client.renderer.FogRenderer.FogMode.FOG_TERRAIN,
+                net.minecraft.world.level.material.FogType.NONE,camera,0,120,160,
+                com.mojang.blaze3d.shaders.FogShape.SPHERE);
+            SporeFog.distance(fog);
+            check(fog.isCanceled()&&fog.getFarPlaneDistance()<160,"corruption shortens real client fog distance");
+        }
         if(ticks==380){check(CorruptionPayload.ClientState.current.index()==10,"live index update reaches client");shot("03-overrun.png");}
-        if(ticks==400)mc.gameMode.useItem(mc.player,InteractionHand.MAIN_HAND);
+        if(ticks==400)useTalisman();
         if(ticks==460){
+            var fog=new net.neoforged.neoforge.client.event.ViewportEvent.RenderFog(
+                net.minecraft.client.renderer.FogRenderer.FogMode.FOG_TERRAIN,
+                net.minecraft.world.level.material.FogType.NONE,mc.gameRenderer.getMainCamera(),0,120,160,
+                com.mojang.blaze3d.shaders.FogShape.SPHERE);
+            SporeFog.distance(fog);
+            check(!fog.isCanceled()&&fog.getFarPlaneDistance()==160,"spore fog resets outside the corrupted world");
             check(mc.level.dimension().equals(net.minecraft.world.level.Level.OVERWORLD),"talisman returns to original dimension");
             check(CorruptionPayload.ClientState.current.index()==-1,"return HUD clears previous dimension value");
             shot("04-return.png");
@@ -107,7 +181,7 @@ public final class ClientValidation {
             check(CorruptionPayload.ClientState.current.region().equals("Ribbed Highlands")&&CorruptionPayload.ClientState.current.regionalIndex()==8,"highland preview has regional pressure 8 at world index 6");shot("06-ribbed-highlands.png");
         }
         if(ticks==920){
-            try{Files.writeString(mc.gameDirectory.toPath().resolve("client-validation.json"),"{\"status\":\"passed\",\"checks\":"+checks+",\"screenshots\":6}\n");}catch(Exception error){throw new RuntimeException(error);}
+            try{Files.writeString(mc.gameDirectory.toPath().resolve("client-validation.json"),"{\"status\":\"passed\",\"checks\":"+checks+",\"screenshots\":7}\n");}catch(Exception error){throw new RuntimeException(error);}
             System.out.println("SPOREBOUND CLIENT ACCEPTANCE PASS");mc.stop();
         }
     }
@@ -142,7 +216,19 @@ public final class ClientValidation {
             check(epochField.getLong(null)==epoch,"corruption notices preserve Civillis notification epoch");cooldown.setInt(null,old);
         }catch(ReflectiveOperationException error){throw new RuntimeException(error);}
     }
-    private static void click(BlockPos pos){var mc=Minecraft.getInstance();mc.gameMode.useItemOn(mc.player,InteractionHand.MAIN_HAND,new BlockHitResult(Vec3.atCenterOf(pos).add(0,0.5,0),Direction.UP,pos,false));}
+    private static boolean holdingTalisman() {
+        return Minecraft.getInstance().player.getMainHandItem().is(Sporebound.TALISMAN.get());
+    }
+    private static boolean atCairn(BlockPos pos) {
+        var mc=Minecraft.getInstance();
+        return pos!=null && mc.player.distanceToSqr(Vec3.atCenterOf(pos))<16
+            && mc.level.getBlockState(pos).is(Blocks.AMETHYST_BLOCK);
+    }
+    private static void useTalisman() {
+        var mc=Minecraft.getInstance();interactionServerTick=serverTicks;
+        mc.gameMode.useItem(mc.player,InteractionHand.MAIN_HAND);
+    }
+    private static void click(BlockPos pos){var mc=Minecraft.getInstance();interactionServerTick=serverTicks;mc.gameMode.useItemOn(mc.player,InteractionHand.MAIN_HAND,new BlockHitResult(Vec3.atCenterOf(pos).add(0,0.5,0),Direction.UP,pos,false));}
     private static synchronized void check(boolean ok,String what){if(!ok)throw new AssertionError(what);checks++;System.out.println("SPOREBOUND CLIENT CHECK PASS: "+what);}
     private static void shot(String name){var mc=Minecraft.getInstance();Screenshot.grab(mc.gameDirectory,name,mc.getMainRenderTarget(),message->System.out.println(message.getString()));}
 }

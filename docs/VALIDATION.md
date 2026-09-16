@@ -1,3 +1,37 @@
+# 0.3.0 development update — 2026-09-16
+
+Artifact: `sporebound-0.3.0-dev.jar`. The GitHub release supplies its SHA-256 checksum.
+Minecraft 1.21.1 / Java 21 / NeoForge 21.1.249 / Spore 2.2.0j.
+
+- Core server fixture: 129 checks on a fresh world and 10 after restart.
+- Combined server fixture with ConcentricWorld 0.31.1 and Civillis 2.0.1-release:
+  132 checks on a fresh world and 10 after restart, recorded by the previous
+  development-server run before the local controller's out-of-memory shutdown.
+- Generation regression checks include 32 sampled submerged columns, structure
+  placement/flooded floors, vanilla village biome eligibility, and outdoor/sheltered
+  exposure. These are bounded samples, not exhaustive seed coverage.
+- A development-server client run passed and produced seven screenshots, including
+  HUD off/on, fog, cairn entry and return, grove and highland previews.
+- GitHub client validation initially exposed asynchronous fixture setup: actions
+  could be sent before client position, inventory and blocks were synchronized.
+  The harness now waits for server ticks after rejection probes and waits for
+  these prerequisites plus both server/client cooldowns with bounded timeouts;
+  failures include position and inventory diagnostics, including on process timeout. Final CI status is recorded
+  in the release workflow; publication is gated on a passing real-client run.
+
+ConcentricWorld's separate fixture verifies all ten capital buildings, references
+beyond eight chunks, and persistence: 123 checks before and 123 after restart.
+Its corrupted church and bakery templates were replaced; the other four are retained.
+
+Generation fixes affect new chunks. Existing underwater turf, incomplete structures,
+and player builds are not rebuilt. Testing does not establish long-running multiplayer
+or GPU performance. Upstream Spore optional-recipe/model warnings and missing audio
+in headless clients are distinct from acceptance failures.
+
+The section below records the earlier 0.2 build, not new 0.3 results.
+
+---
+
 # Verified development build — 2026-09-16
 
 Artifact: `sporebound-0.2.0-dev.jar`. See the release `SHA256SUMS` for its checksum.

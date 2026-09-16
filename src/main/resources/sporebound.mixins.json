@@ -15,7 +15,8 @@
     "TemplateManagerMixin",
     "TemplateMixin",
     "HiveAdmissionMixin",
-    "HiveRemovalMixin"
+    "HiveRemovalMixin",
+    "StructureTerrainMixin"
   ],
   "injectors": {
     "defaultRequire": 1

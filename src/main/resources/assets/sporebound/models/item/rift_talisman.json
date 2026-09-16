@@ -1,7 +1,9 @@
 {
-  "parent": "minecraft:item/generated",
-  "textures": {
-    "layer0": "minecraft:item/ender_eye",
-    "layer1": "minecraft:item/amethyst_shard"
+  "parent": "minecraft:item/handheld",
+  "textures": {"layer0": "sporebound:item/rift_talisman"},
+  "display": {
+    "gui": {"rotation": [0, 0, 0], "translation": [0, 0, 0], "scale": [1, 1, 1]},
+    "ground": {"rotation": [0, 0, 0], "translation": [0, 2, 0], "scale": [0.5, 0.5, 0.5]},
+    "fixed": {"rotation": [0, 180, 0], "translation": [0, 0, 0], "scale": [0.75, 0.75, 0.75]}
   }
 }

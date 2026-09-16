@@ -25,6 +25,18 @@ class CorruptionMathTest {
         assertEquals(2,CorruptionMath.regional(6,-4));assertEquals(8,CorruptionMath.regional(6,2));
         assertEquals(0,CorruptionMath.regional(1,-4));assertEquals(10,CorruptionMath.regional(9,2));
     }
+    @Test void fogRespectsLockedStatesAndRegionalRefuges() {
+        for(double index:new double[]{-2,-1,0,1,2}) {
+            assertEquals(0,CorruptionMath.fogDensity(index));
+            assertFalse(CorruptionMath.hazardousFog(index));
+        }
+        assertEquals(0,CorruptionMath.fogDensity(CorruptionMath.regional(6,-4)));
+        assertEquals(0.5,CorruptionMath.fogDensity(6));
+        assertEquals(1,CorruptionMath.fogDensity(10));
+        assertFalse(CorruptionMath.hazardousFog(7.999));
+        assertTrue(CorruptionMath.hazardousFog(CorruptionMath.regional(6,2)));
+        assertFalse(CorruptionMath.hazardousFog(CorruptionMath.regional(10,-4)));
+    }
     @Test void scalingStaysBounded() {
         assertEquals(0,CorruptionMath.healthBonus(-2)); assertEquals(1.5,CorruptionMath.healthBonus(10));
         assertEquals(1,CorruptionMath.damageBonus(10));
