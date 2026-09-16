@@ -22,6 +22,7 @@ import net.neoforged.neoforge.client.event.ClientTickEvent;
 @EventBusSubscriber(modid=Sporebound.ID,value=Dist.CLIENT)
 public final class ClientValidation {
     private static int ticks,checks;
+    private static long waitingSince;
     private static volatile BlockPos departure,arrival;
     @SubscribeEvent public static void tick(ClientTickEvent.Post event) {
         if(!Boolean.getBoolean("sporebound.clientValidation"))return;
@@ -32,6 +33,28 @@ public final class ClientValidation {
         }
         if(mc.level==null||mc.player==null||mc.getSingleplayerServer()==null)return;
         ++ticks;
+        // CI clients can outrun integrated-server world generation. Wait for the actual
+        // synchronized state with a wall-clock deadline, instead of assuming 80 frames.
+        var state=CorruptionPayload.ClientState.current;
+        boolean ready=switch(ticks) {
+            case 80 -> departure!=null && state!=null && state.index()==-1;
+            case 280,320,610 -> mc.level.dimension().equals(Sporebound.BLIGHT)
+                && state!=null && state.dimension().equals(Sporebound.BLIGHT.location()) && state.index()>=6;
+            case 375 -> state!=null && state.index()==10;
+            case 460,700 -> mc.level.dimension().equals(net.minecraft.world.level.Level.OVERWORLD)
+                && state!=null && state.index()==-1;
+            case 640 -> arrival!=null && mc.player.getMainHandItem().isEmpty();
+            case 800 -> state!=null && state.region().equals("Remnant Grove") && state.regionalIndex()==2;
+            case 900 -> state!=null && state.region().equals("Ribbed Highlands") && state.regionalIndex()==8;
+            default -> true;
+        };
+        if(!ready) {
+            if(waitingSince==0)waitingSince=System.nanoTime();
+            if(System.nanoTime()-waitingSince>120_000_000_000L)
+                throw new AssertionError("Timed out waiting for client stage "+ticks+": "+state);
+            --ticks;return;
+        }
+        waitingSince=0;
         if(ticks==1){mc.options.pauseOnLostFocus=false;mc.options.hideGui=false;mc.setScreen(null);
             mc.getSingleplayerServer().execute(()->{
                 var server=mc.getSingleplayerServer();var player=server.getPlayerList().getPlayers().getFirst();

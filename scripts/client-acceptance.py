@@ -24,8 +24,8 @@ log=root/'client-validation.log'
 with log.open('w') as out:
     result=subprocess.run(['xvfb-run','-a','-s','-screen 0 1280x720x24','bash','gradlew','--no-daemon','runClient','-PclientValidation'],cwd=root,env=env,stdout=out,stderr=subprocess.STDOUT,timeout=600)
 text=log.read_text(errors='replace')
-assert result.returncode==0 and 'SPOREBOUND CLIENT ACCEPTANCE PASS' in text,text[-10000:]
-for name in ['01-dormant','02-blighted-world','03-overrun','04-return','05-remnant-grove','06-ribbed-highlands']:
+assert result.returncode==0 and 'SPOREBOUND CLIENT ACCEPTANCE PASS' in text, '\n'.join(line for line in text.splitlines() if any(word in line for word in ['AssertionError', 'CHECK PASS', 'Caused by:', 'Exception']))+'\n'+text[-10000:]
+for name in ['01-dormant','02-blighted-world','03-overrun','04-return','05-remnant-grove','06-ribbed-highlands','07-hud-off']:
     assert (run/'screenshots'/(name+'.png')).is_file(),name
 assert 'arrival is above bedrock and collision free' in text
 assert 'arrival has a solid landing surface' in text
