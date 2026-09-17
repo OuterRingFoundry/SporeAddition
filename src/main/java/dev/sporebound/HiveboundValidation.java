@@ -76,7 +76,7 @@ public final class HiveboundValidation {
             check.accept(!Hivebound.locked(player,helmet)&&menu.getSlot(5).mayPickup(player),"negative dimension Index unlocks armor: "+index);
         }
         menu.clicked(5,0,ClickType.PICKUP,player);
-        check.accept(player.getItemBySlot(EquipmentSlot.HEAD).isEmpty()&&menu.getCarried()==helmet,"unlocked armor can actually be removed");
+        check.accept(player.getItemBySlot(EquipmentSlot.HEAD).isEmpty()&&menu.getCarried().is(Hivebound.HELMET.get())&&menu.getCarried().getCount()==1,"unlocked armor can actually be removed");
         menu.clicked(5,0,ClickType.PICKUP,player);
         CorruptionData.get(level).set(6);
         try {
