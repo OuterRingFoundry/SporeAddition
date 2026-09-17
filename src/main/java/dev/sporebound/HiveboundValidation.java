@@ -34,6 +34,7 @@ public final class HiveboundValidation {
         for(int i=0;i<4;i++){
             var base=new ItemStack(originals[i]);base.set(DataComponents.CUSTOM_NAME,Component.literal("Preserved symbiont"));
             base.setDamageValue(12);
+            base.enchant(level.registryAccess().registryOrThrow(Registries.ENCHANTMENT).getHolderOrThrow(net.minecraft.world.item.enchantment.Enchantments.VANISHING_CURSE),1);
             var input=new SmithingRecipeInput(new ItemStack(Sitems.LIVING_CORE.get()),base,new ItemStack(Sitems.REFORGED_BIOMASS_A.get()));
             var recipe=level.getRecipeManager().getRecipeFor(RecipeType.SMITHING,input,level);
             check.accept(recipe.isPresent(),"Hivebound smithing recipe loads for "+Hivebound.SLOTS.get(i));
@@ -69,7 +70,7 @@ public final class HiveboundValidation {
         player.setGameMode(GameType.SURVIVAL);
         CorruptionData.get(level).set(0);Hivebound.update(player);
         check.accept(Hivebound.locked(player,helmet)&&player.getMaxHealth()<20&&player.getAttributeValue(Attributes.MOVEMENT_SPEED)<0.1,
-            "Normal Index zero weakens symbiosis but does not unlock it");
+            "Normal Index zero weakens symbiosis but does not unlock it: health="+player.getMaxHealth()+", speed="+player.getAttributeValue(Attributes.MOVEMENT_SPEED)+", locked="+Hivebound.locked(player,helmet));
         for(int index:new int[]{-1,-2}){
             CorruptionData.get(level).set(index);
             check.accept(!Hivebound.locked(player,helmet)&&menu.getSlot(5).mayPickup(player),"negative dimension Index unlocks armor: "+index);
@@ -78,11 +79,15 @@ public final class HiveboundValidation {
         check.accept(player.getItemBySlot(EquipmentSlot.HEAD).isEmpty()&&menu.getCarried()==helmet,"unlocked armor can actually be removed");
         menu.clicked(5,0,ClickType.PICKUP,player);
         CorruptionData.get(level).set(6);
+        try {
+            var vanishing=net.minecraft.world.entity.player.Player.class.getDeclaredMethod("destroyVanishingCursedItems");
+            vanishing.setAccessible(true);vanishing.invoke(player);
+        }catch(ReflectiveOperationException error){throw new RuntimeException(error);}
         player.getInventory().dropAll();
         check.accept(player.getItemBySlot(EquipmentSlot.HEAD).isEmpty(),"death moves bound armor into recovery storage before inventory drops");
         var saved=player.getPersistentData().copy();Hivebound.restore(player,saved);
         check.accept(Hivebound.member(player)&&player.getItemBySlot(EquipmentSlot.HEAD).getHoverName().getString().equals("Preserved symbiont"),
-            "death recovery restores all bound armor with its components");
+            "death recovery preserves cursed bound armor and its components before vanishing");
         var recovered=player.getItemBySlot(EquipmentSlot.HEAD);Hivebound.restore(player,saved);
         check.accept(recovered==player.getItemBySlot(EquipmentSlot.HEAD),"death recovery consumes its saved payload exactly once");
         player.getPersistentData().remove("sporebound:bound_armor");

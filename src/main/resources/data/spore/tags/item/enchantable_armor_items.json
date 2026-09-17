@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "values": [
+    "sporebound:hivebound_helmet",
+    "sporebound:hivebound_chestplate",
+    "sporebound:hivebound_leggings",
+    "sporebound:hivebound_boots"
+  ]
+}

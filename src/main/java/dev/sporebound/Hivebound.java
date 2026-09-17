@@ -55,23 +55,30 @@ public final class Hivebound {
         double health=member?(index>0?index*0.10:-0.20):0;
         double damage=member?(index>0?index*0.075:-0.25):0;
         double speed=member?(index>0?index*0.015:-0.15):0;
-        float fraction=player.getHealth()/player.getMaxHealth();
-        boolean changed=modifier(player,Attributes.MAX_HEALTH,HEALTH,health);
-        modifier(player,Attributes.ATTACK_DAMAGE,DAMAGE,damage);modifier(player,Attributes.MOVEMENT_SPEED,SPEED,speed);
-        if(changed)player.setHealth(Math.min(player.getMaxHealth(),player.getMaxHealth()*fraction));
-        if(member){
+        float oldMaximum=player.getMaxHealth(),fraction=player.getHealth()/oldMaximum;
+        String owned="sporebound:armor_symbiosis";
+        if(!member||index<=0){
+            if(player.getPersistentData().getBoolean(owned))player.removeEffect(Seffects.SYMBIOSIS);
+            player.getPersistentData().remove(owned);
+        }else {
             for(var effect:List.copyOf(player.getActiveEffects()))
                 if(BuiltInRegistries.MOB_EFFECT.getKey(effect.getEffect().value()).getNamespace().equals("spore")
                     &&!effect.getEffect().value().isBeneficial())player.removeEffect(effect.getEffect());
-            if(index>0&&!player.hasEffect(Seffects.FROSTBITE))
+            var symbiosis=player.getEffect(Seffects.SYMBIOSIS);
+            if(symbiosis==null||(player.getPersistentData().getBoolean(owned)&&symbiosis.getDuration()<20)){
                 player.addEffect(new MobEffectInstance(Seffects.SYMBIOSIS,40,0,false,false));
+                player.getPersistentData().putBoolean(owned,true);
+            }
         }
+        modifier(player,Attributes.MAX_HEALTH,HEALTH,health);
+        modifier(player,Attributes.ATTACK_DAMAGE,DAMAGE,damage);modifier(player,Attributes.MOVEMENT_SPEED,SPEED,speed);
+        if(player.getMaxHealth()!=oldMaximum)player.setHealth(Math.min(player.getMaxHealth(),player.getMaxHealth()*fraction));
     }
     private static boolean modifier(Player player,Holder<Attribute> attribute,ResourceLocation id,double value){
         var instance=player.getAttribute(attribute);if(instance==null)return false;
         var old=instance.getModifier(id);if(old!=null&&old.amount()==value)return false;
         instance.removeModifier(id);
-        if(value!=0)instance.addTransientModifier(new AttributeModifier(id,value,AttributeModifier.Operation.ADD_MULTIPLIED_BASE));
+        if(value!=0)instance.addPermanentModifier(new AttributeModifier(id,value,AttributeModifier.Operation.ADD_MULTIPLIED_BASE));
         return old!=null||value!=0;
     }
     @SubscribeEvent public void tick(EntityTickEvent.Pre event){

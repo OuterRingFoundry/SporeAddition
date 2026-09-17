@@ -14,6 +14,7 @@ import java.util.function.Consumer;
 public final class SymbiosisClientValidation {
     private static int phase,ticks;
     private static long deadline;
+    private static boolean sent;
     public static boolean tick(BiConsumer<Boolean,String> check,Consumer<String> screenshot){
         var mc=Minecraft.getInstance();
         if(phase==0){
@@ -28,7 +29,10 @@ public final class SymbiosisClientValidation {
         }
         if(System.nanoTime()>deadline)throw new AssertionError("Timed out waiting for symbiotic client phase "+phase);
         if(phase==1){
-            if(!Hivebound.member(mc.player)||++ticks<30)return false;
+            if(!Hivebound.member(mc.player))return false;
+            if(!sent){sent=true;mc.getConnection().send(new net.minecraft.network.protocol.game.ServerboundSetCreativeModeSlotPacket(5,ItemStack.EMPTY));}
+            if(++ticks<30)return false;
+            check.accept(Hivebound.member(mc.player),"real creative slot packet retains bound equipment on server and client");
             check.accept(ArmorModelList.ARMOR_RENDERING_BITS.stream().filter(p->p instanceof HiveboundRendering.BoundPart).count()==9,
                 "Hivebound set registers all nine native organic armor parts");
             for(var slot:Hivebound.SLOTS){
