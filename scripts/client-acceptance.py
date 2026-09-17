@@ -43,7 +43,10 @@ with log.open('w') as out:
                 if 'jdk.jcmd' in line:continue
                 pid=line.split(maxsplit=1)[0]
                 if pid.isdigit():
-                    subprocess.run(['jcmd',pid,'Thread.print'],stdout=out,stderr=subprocess.STDOUT,timeout=10)
+                    dump=subprocess.run(['jcmd',pid,'Thread.print'],capture_output=True,text=True,timeout=10)
+                    out.write(dump.stdout+dump.stderr)
+                    for block in dump.stdout.split('\n\n'):
+                        if any(name in block for name in ['\"Server thread\"','\"Render thread\"','deadlock']):print(block,flush=True)
         except (OSError,subprocess.TimeoutExpired):pass
         os.killpg(process.pid,signal.SIGTERM)
         try:process.wait(timeout=10)

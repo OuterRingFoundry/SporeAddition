@@ -187,6 +187,7 @@ public final class ClientValidation {
             // Leave through the normal disconnect path while client tasks can still run.
             // Stopping the render loop first can strand integrated-server save work.
             finished=true;
+            mc.level.disconnect();
             mc.disconnect();
             System.out.println("SPOREBOUND CLIENT ACCEPTANCE PASS");mc.stop();
         }
