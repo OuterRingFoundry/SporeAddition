@@ -18,7 +18,11 @@ public final class EvolutionHud {
             ||!Hivebound.member(mc.player)||data==null||!mc.player.getUUID().equals(data.player()))return;
         int width=88,x=g.guiWidth()/2+98,y=g.guiHeight()-29;
         // Narrow windows keep the meter visible above the hotbar instead of clipping it.
-        if(x+width+6>g.guiWidth()){x=g.guiWidth()/2-width/2;y-=28;}
+        if(x+width+6>g.guiWidth()){
+            int rows=Math.max(1,(int)Math.ceil((mc.player.getMaxHealth()+mc.player.getAbsorptionAmount())/20));
+            int healthTop=g.guiHeight()-39-(rows-1)*Math.max(10-(rows-2),3);
+            x=g.guiWidth()/2-width/2;y=Math.min(y-28,healthTop-18);
+        }
         int stage=EvolutionMath.stage(data.points(),data.first(),data.hyper());
         int fill=(int)Math.round(width*EvolutionMath.progress(data.points(),data.first(),data.hyper()));
         g.fill(x-1,y-2,x+width+1,y+6,0xEE211D30);g.fill(x,y-1,x+width,y+5,0xFF47394B);

@@ -7,7 +7,7 @@ an official Spore release.
 
 ## Sporebound 0.6.0
 
-Version 0.6.0 adds cooperative Hive biomass sharing, craftable Hivebound armor with dimension-dependent binding Spore kinship, evolution and followers, and an Index bar that visibly decays from meadow to infestation. See [recipes and mechanics](docs/RELEASE_0.6.0.md).
+Version 0.6.0 adds cooperative Hive biomass sharing, craftable Hivebound armor with dimension-dependent binding, Spore kinship, evolution and followers, and an Index bar that visibly decays from meadow to infestation. See [recipes and mechanics](docs/RELEASE_0.6.0.md).
 
 Version 0.5.0 replaces vanilla mushrooms in corrupted biomes with Spore colonies,
 uses distinct Spore soil, adds health-scaled biomass and item feeding, enables

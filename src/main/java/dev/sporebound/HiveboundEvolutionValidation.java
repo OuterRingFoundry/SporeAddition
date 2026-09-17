@@ -27,13 +27,13 @@ public final class HiveboundEvolutionValidation {
         var base=player.blockPosition();
         for(var pos:net.minecraft.core.BlockPos.betweenClosed(base.offset(-1,-1,-1),base.offset(8,-1,1)))level.setBlockAndUpdate(pos,Blocks.STONE.defaultBlockState());
         var basic=Sentities.INF_HUMAN.get().create(level);basic.moveTo(player.getX()+6,player.getY(),player.getZ());
-        basic.setEvoPoints(0);basic.setKills(3);basic.tickCount=80;
+        basic.setEvoPoints(0);basic.setKills(3);basic.tickCount=80;basic.setOnGround(true);
         check.accept(level.addFreshEntity(basic),"lower-level native follower joins world");
         level.addNewPlayer(player);
         var goal=basic.goalSelector.getAvailableGoals().stream().map(g->g.getGoal()).filter(g->g instanceof HiveboundFollowGoal)
             .map(g->(HiveboundFollowGoal)g).findFirst().orElseThrow();
         check.accept(HiveboundEvolution.dominates(player,basic)&&goal.canUse(),"lower-level infected chooses the nearby Hivebound player as leader");
-        goal.tick();check.accept(!basic.getNavigation().isDone(),"follower starts a real navigation path toward its leader");
+        goal.tick();check.accept(!basic.getNavigation().isDone(),"follower starts a real navigation path toward its leader: ground="+basic.onGround()+", distance="+basic.distanceTo(player)+", path="+basic.getNavigation().getPath());
         basic.setEvoPoints(HiveboundEvolution.points(player));
         check.accept(!goal.canContinueToUse(),"equal-level infected stops following");basic.setEvoPoints(0);goal.stop();
         basic.moveTo(player.getX()+1,player.getY(),player.getZ());
