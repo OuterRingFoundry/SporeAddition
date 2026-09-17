@@ -21,11 +21,11 @@ jobs:
           sudo apt-get install -y xvfb libgl1-mesa-dri libglx-mesa0 libopenal1
           python3 scripts/client-acceptance.py --source run-ci-core/world
       - name: Checksum validated build
-        run: sha256sum build/libs/sporebound-0.4.0-dev.jar > build/libs/sporebound-0.4.0-dev.jar.sha256
+        run: sha256sum build/libs/sporebound-0.4.0.jar > build/libs/sporebound-0.4.0.jar.sha256
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: sporebound-development
+          name: sporebound-0.4.0-validation
           path: |
             build/libs/*.jar
             build/libs/*.sha256
@@ -37,35 +37,38 @@ jobs:
 
   publish:
     needs: validate
-    if: github.event_name == 'push' && github.ref == 'refs/heads/fix/worldgen-hud-spore-fog'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     permissions:
       contents: write
     steps:
+      - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
         with:
-          name: sporebound-development
+          name: sporebound-0.4.0-validation
           path: verified
-      - name: Publish verified sporebound-0.3.0-dev.jar and checksum
+      - name: Publish and verify Sporebound 0.4.0
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
         run: |
           set -euo pipefail
           mkdir release
-          mapfile -t jars < <(find verified -type f -name 'sporebound-0.3.0-dev.jar')
+          mapfile -t jars < <(find verified -type f -name 'sporebound-0.4.0.jar')
           test "${#jars[@]}" -eq 1
           cp "${jars[0]}" release/
+          cp docs/RELEASE_0.4.0.md release/RELEASE_NOTES.md
           cd release
-          sha256sum 'sporebound-0.3.0-dev.jar' > 'sporebound-0.3.0-dev.jar.sha256'
-          cat > RELEASE_NOTES.md <<'NOTES'
-          Terrain and atmosphere update for Minecraft 1.21.1 / NeoForge 21.1.249 / Java 21. Requires Spore 2.2.0j on both server and clients. Adds sediment seabeds, terrain-aware ruins, villages, a compact toggleable corruption HUD, spore fog/exposure, and new Rift Talisman artwork. Generation fixes affect new chunks; existing terrain is not rebuilt. Build, server/restart checks, and the real-client acceptance test must all pass before this release is published.
-          NOTES
-          if gh release view 'v0.3.0-dev' >/dev/null 2>&1; then
-            mkdir existing
-            gh release download 'v0.3.0-dev' --pattern 'sporebound-0.3.0-dev.jar.sha256' --dir existing
-            cmp 'sporebound-0.3.0-dev.jar.sha256' 'existing/sporebound-0.3.0-dev.jar.sha256'
-            echo 'Existing release contains the identical validated JAR; preserving it.'
+          unzip -p sporebound-0.4.0.jar META-INF/neoforge.mods.toml | grep -q 'version="0.4.0"'
+          sha256sum sporebound-0.4.0.jar > sporebound-0.4.0.jar.sha256
+          if gh release view v0.4.0 >/dev/null 2>&1; then
+            test "$(gh api "repos/$GH_REPO/git/ref/tags/v0.4.0" --jq .object.sha)" = "$GITHUB_SHA"
           else
-            gh release create 'v0.3.0-dev' 'sporebound-0.3.0-dev.jar' 'sporebound-0.3.0-dev.jar.sha256' --target "$GITHUB_SHA" --title 'Sporebound 0.3.0 development' --notes-file RELEASE_NOTES.md --prerelease
+            gh release create v0.4.0 sporebound-0.4.0.jar sporebound-0.4.0.jar.sha256 --target "$GITHUB_SHA" --title 'Sporebound 0.4.0 — Fungal Remnants' --notes-file RELEASE_NOTES.md --latest
           fi
+          mkdir published
+          gh release download v0.4.0 --pattern sporebound-0.4.0.jar --pattern sporebound-0.4.0.jar.sha256 --dir published
+          cmp sporebound-0.4.0.jar published/sporebound-0.4.0.jar
+          cmp sporebound-0.4.0.jar.sha256 published/sporebound-0.4.0.jar.sha256
+          cd published
+          sha256sum --check sporebound-0.4.0.jar.sha256

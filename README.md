@@ -5,19 +5,17 @@ It adds a corrupted Overworld-like dimension, per-dimension corruption, and perm
 Spore protection for Overworld mushroom islands. This is an independent addon, not
 an official Spore release.
 
-## Current development work
+## Sporebound 0.4.0
 
-Version 0.4 adds corrupted skies, Remnant Mycelial Crust, all-creature targeting,
-and animated Infected Biomass merging/feeding. Its build, server/restart checks,
-and real-client acceptance passed on `feat/infected-biomass`.
-[Download the validated development JAR and evidence](https://github.com/OuterRingFoundry/SporeAddition/actions/runs/35113467666/artifacts/10453014401).
-See [implementation and validation notes](docs/INFECTED_BIOMASS.md). The branch has
-not yet been merged or published as a release.
+Version 0.4.0 adds corrupted skies, Remnant Mycelial Crust, all-creature targeting,
+and animated Infected Biomass merging and feeding.
+See [implementation and validation notes](docs/INFECTED_BIOMASS.md).
 
 ## Installation
 
-Download `sporebound-0.3.0-dev.jar` and its SHA-256 checksum from the
-[0.3.0 development release](https://github.com/OuterRingFoundry/SporeAddition/releases/tag/v0.3.0-dev).
+Download `sporebound-0.4.0.jar` and its SHA-256 checksum from the
+[0.4.0 release](https://github.com/OuterRingFoundry/SporeAddition/releases/tag/v0.4.0).
+Replace the older Sporebound JAR on both server and clients; keep only one version.
 
 
 Use Java 21, NeoForge **21.1.249**, and [**Spore 2.2.0j for NeoForge 1.21.1**](https://www.curseforge.com/minecraft/mc-mods/fungal-infection-spore/files/8342823)
@@ -29,7 +27,7 @@ are bundled into this mod.
 Optional compatibility targets: ConcentricWorld 0.31.1 structure-fix build and
 Civillis 2.0.1-release. See `compatibility/` for precise artifact identities.
 
-Versions 0.2 and 0.3 change only newly generated terrain; old chunks retain their previous landscape.
+Versions 0.2 through 0.4 change only newly generated terrain; old chunks retain their previous landscape.
 Upgrading from 0.1 performs a one-time census of stored Hive Mind entities without
 loading their chunks. Existing founders are subject to the new population caps.
 
@@ -64,7 +62,7 @@ If no safe spot exists, travel refuses instead of digging through buildings.
 
 The Blighted World is a fractured patchwork. Its own folded noise terrain makes
 uneven uplands, flooded depressions and overhangs, while caves and ores remain
-available. Corrupted areas contain fungal vegetation and Spore ruins. Calcite ribs
+available. Corrupted areas contain fungal vegetation and Spore ruins. Pale fungal-remnant ribs
 with dark feet and luminous tips occasionally rise from suitable flat ground.
 Intact **Remnant Groves** retain grass, ordinary trees, animals and an Overworld sky.
 These are living frontiers, not the permanently protected Overworld mushroom islands.

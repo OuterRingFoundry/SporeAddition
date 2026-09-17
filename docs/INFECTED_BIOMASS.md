@@ -1,8 +1,8 @@
-# Sporebound 0.4 development: fungal remnants
+# Sporebound 0.4.0: fungal remnants
 
-Status: uploaded and validated on `feat/infected-biomass`. Clean build, 155
-fresh-world checks, 11 restart checks, and real-client acceptance all passed.
-This is a development artifact; it has not been merged or published as a release.
+The 0.4.0 release contains the fungal-remnant and biomass update. Publication is
+gated on a clean build, fresh-world checks, restart checks, and real-client
+acceptance. [Release JAR and checksum](https://github.com/OuterRingFoundry/SporeAddition/releases/tag/v0.4.0).
 
 ## Player-facing changes
 

@@ -1,4 +1,4 @@
-# 0.4.0-dev — fungal remnants
+# 0.4.0 — fungal remnants
 
 - Corruption-dependent rose/mauve sky and discolored clouds.
 - Original Remnant Mycelial Crust replaces generated calcite surface/rib blocks.
@@ -9,7 +9,7 @@
 - Build, 155 fresh-world checks, 11 restart checks, and real-client acceptance pass.
 
 See [0.4 verification and limitations](INFECTED_BIOMASS.md). New terrain changes
-apply to newly generated chunks. This is a validated feature-branch artifact.
+apply to newly generated chunks. The release includes the JAR and its SHA-256 checksum.
 
 # 0.3.0-dev — terrain and atmosphere update
 
