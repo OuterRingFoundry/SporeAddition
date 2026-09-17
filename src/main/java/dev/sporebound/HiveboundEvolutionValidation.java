@@ -69,6 +69,6 @@ public final class HiveboundEvolutionValidation {
             "partial armor cannot earn fungal kill credit or command infected");
         player.setItemSlot(EquipmentSlot.HEAD,helmet);
         level.setBlockAndUpdate(base.below(),Blocks.STONE.defaultBlockState());
-        level.removePlayerImmediately(player,Entity.RemovalReason.DISCARDED);
+
     }
 }

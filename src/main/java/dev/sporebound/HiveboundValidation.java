@@ -93,7 +93,8 @@ public final class HiveboundValidation {
         player.getPersistentData().remove("sporebound:bound_armor");
         HiveboundEvolutionValidation.run(level,player,check);
         player.getInventory().clearContent();Hivebound.update(player);
-        check.accept(!Hivebound.member(player)&&player.getMaxHealth()==20,"removing the set clears membership and scaling");
+        check.accept(!Hivebound.member(player)&&player.getMaxHealth()==20,"removing the set clears membership and scaling: member="+Hivebound.member(player)+", health="+player.getMaxHealth()+", effects="+player.getActiveEffects()+", modifiers="+player.getAttribute(Attributes.MAX_HEALTH).getModifiers());
+        level.removePlayerImmediately(player,net.minecraft.world.entity.Entity.RemovalReason.DISCARDED);
         CorruptionData.get(level).set(before);
     }
 }
