@@ -29,15 +29,15 @@ public final class FungalClientValidation {
                 level.setBlockAndUpdate(ORIGIN.offset(x,-1,z),FungalContent.CRUST.get().defaultBlockState());
                 for(int y=0;y<5;y++)level.setBlockAndUpdate(ORIGIN.offset(x,y,z),net.minecraft.world.level.block.Blocks.AIR.defaultBlockState());
             }
-            var donor=FungalContent.BIOMASS.get().create(level);donor.setNoAi(true);donor.setNoGravity(true);
-            donor.moveTo(ORIGIN.getX()+1.6,ORIGIN.getY(),ORIGIN.getZ());level.addFreshEntity(donor);donorId=donor.getId();
-            var receiver=FungalContent.BIOMASS.get().create(level);receiver.setNoAi(true);receiver.setNoGravity(true);receiver.setMass(3);
-            receiver.moveTo(ORIGIN.getX()+3,ORIGIN.getY(),ORIGIN.getZ());level.addFreshEntity(receiver);receiverId=receiver.getId();
-            var feeder=com.Harbinger.Spore.core.Sentities.INF_HUMAN.get().create(level);feeder.setNoAi(true);feeder.setNoGravity(true);
+            var donor=FungalContent.BIOMASS.get().create(level);donor.setNoAi(true);donor.setNoGravity(true);donor.setPersistenceRequired();donor.setInvulnerable(true);
+            donor.moveTo(ORIGIN.getX()+1.6,ORIGIN.getY(),ORIGIN.getZ());if(!level.addFreshEntity(donor))throw new AssertionError("Display fixture spawn rejected: donor");donorId=donor.getId();
+            var receiver=FungalContent.BIOMASS.get().create(level);receiver.setNoAi(true);receiver.setNoGravity(true);receiver.setPersistenceRequired();receiver.setInvulnerable(true);receiver.setMass(3);
+            receiver.moveTo(ORIGIN.getX()+3,ORIGIN.getY(),ORIGIN.getZ());if(!level.addFreshEntity(receiver))throw new AssertionError("Display fixture spawn rejected: receiver");receiverId=receiver.getId();
+            var feeder=com.Harbinger.Spore.core.Sentities.INF_HUMAN.get().create(level);feeder.setNoAi(true);feeder.setNoGravity(true);feeder.setPersistenceRequired();feeder.setInvulnerable(true);
             feeder.setHunger(SConfig.SERVER.hunger.get());feeder.moveTo(ORIGIN.getX()-1.5,ORIGIN.getY(),ORIGIN.getZ());
-            level.addFreshEntity(feeder);feederId=feeder.getId();
-            var food=FungalContent.BIOMASS.get().create(level);food.setNoAi(true);food.setNoGravity(true);
-            food.moveTo(ORIGIN.getX()-3,ORIGIN.getY(),ORIGIN.getZ());level.addFreshEntity(food);foodId=food.getId();
+            if(!level.addFreshEntity(feeder))throw new AssertionError("Display fixture spawn rejected: feeder");feederId=feeder.getId();
+            var food=FungalContent.BIOMASS.get().create(level);food.setNoAi(true);food.setNoGravity(true);food.setPersistenceRequired();food.setInvulnerable(true);
+            food.moveTo(ORIGIN.getX()-3,ORIGIN.getY(),ORIGIN.getZ());if(!level.addFreshEntity(food))throw new AssertionError("Display fixture spawn rejected: food");foodId=food.getId();
             player.setGameMode(GameType.SPECTATOR);
             player.teleportTo(level,ORIGIN.getX(),ORIGIN.getY()+2.5,ORIGIN.getZ()+7,Set.of(),180,16);
             CorruptionData.get(level).set(6);WorldRules.sync(player);prepared=true;
@@ -45,7 +45,11 @@ public final class FungalClientValidation {
     }
     public static boolean tick(BiConsumer<Boolean,String> check, Consumer<String> screenshot) {
         var mc=Minecraft.getInstance();
-        if(System.nanoTime()>deadline)throw new AssertionError("Timed out waiting for fungal client phase "+phase);
+        if(System.nanoTime()>deadline)throw new AssertionError("Timed out waiting for fungal client phase "+phase
+            +"; prepared="+prepared+"; position="+(mc.player==null?null:mc.player.position())
+            +"; dimension="+(mc.level==null?null:mc.level.dimension())
+            +"; donor="+describe(donorId)+"; receiver="+describe(receiverId)+"; feeder="+describe(feederId)+"; food="+describe(foodId)
+            +"; floor="+(mc.level==null?null:mc.level.getBlockState(ORIGIN.below())));
         if(!prepared || mc.level==null || !mc.level.dimension().equals(Sporebound.BLIGHT)
                 || mc.player.distanceToSqr(Vec3.atCenterOf(ORIGIN))>100)return false;
         var donor=mc.level.getEntity(donorId);var receiver=mc.level.getEntity(receiverId);var feeder=mc.level.getEntity(feederId);var food=mc.level.getEntity(foodId);
@@ -83,6 +87,10 @@ public final class FungalClientValidation {
             screenshot.accept("10-biomass-integrated.png");phase=3;return true;
         }
         return phase==3;
+    }
+    private static String describe(int id) {
+        var level=Minecraft.getInstance().level;var entity=level==null?null:level.getEntity(id);
+        return id+":"+entity+(entity instanceof InfectedBiomass biomass?" mass="+biomass.mass():"");
     }
     private static void validateSky(BiConsumer<Boolean,String> check) {
         var mc=Minecraft.getInstance();var saved=CorruptionPayload.ClientState.current;
