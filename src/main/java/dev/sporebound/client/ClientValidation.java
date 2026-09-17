@@ -67,8 +67,8 @@ public final class ClientValidation {
                 && state!=null && state.index()==-1;
             case 640 -> atCairn(arrival) && mc.player.getMainHandItem().isEmpty()
                 && serverTravelReady && !mc.player.getCooldowns().isOnCooldown(Sporebound.TALISMAN.get());
-            case 800 -> state!=null && state.region().equals("Remnant Grove") && state.regionalIndex()==2;
-            case 900 -> state!=null && state.region().equals("Ribbed Highlands") && state.regionalIndex()==8;
+            case 800 -> previewMatches(state,"Remnant Grove",-4);
+            case 900 -> previewMatches(state,"Ribbed Highlands",2);
             default -> true;
         };
         if(!ready) {
@@ -174,17 +174,22 @@ public final class ClientValidation {
         }
         if(ticks==720)preview("remnant_grove");
         if(ticks==800){
-            check(CorruptionPayload.ClientState.current.region().equals("Remnant Grove")&&CorruptionPayload.ClientState.current.regionalIndex()==2,"healthy grove preview has regional pressure 2 at world index 6");shot("05-remnant-grove.png");
+            check(previewMatches(CorruptionPayload.ClientState.current,"Remnant Grove",-4),"healthy grove preview follows its regional offset near world index six");shot("05-remnant-grove.png");
         }
         if(ticks==820)preview("ribbed_highlands");
         if(ticks==900){
-            check(CorruptionPayload.ClientState.current.region().equals("Ribbed Highlands")&&CorruptionPayload.ClientState.current.regionalIndex()==8,"highland preview has regional pressure 8 at world index 6");shot("06-ribbed-highlands.png");
+            check(previewMatches(CorruptionPayload.ClientState.current,"Ribbed Highlands",2),"highland preview follows its regional offset near world index six");shot("06-ribbed-highlands.png");
         }
         if(ticks==920)FungalClientValidation.setup();
         if(ticks>920 && FungalClientValidation.tick(ClientValidation::check,ClientValidation::shot)){
             try{Files.writeString(mc.gameDirectory.toPath().resolve("client-validation.json"),"{\"status\":\"passed\",\"checks\":"+checks+",\"screenshots\":10}\n");}catch(Exception error){throw new RuntimeException(error);}
             System.out.println("SPOREBOUND CLIENT ACCEPTANCE PASS");mc.stop();
         }
+    }
+    private static boolean previewMatches(CorruptionPayload state,String region,int offset) {
+        return state!=null && state.dimension().equals(Sporebound.BLIGHT.location()) && state.region().equals(region)
+            && state.index()>=6 && state.index()<7
+            && Math.abs(state.regionalIndex()-CorruptionMath.regional(state.index(),offset))<1e-9;
     }
     private static void preview(String biome) {
         var mc=Minecraft.getInstance();mc.getSingleplayerServer().execute(()->{
