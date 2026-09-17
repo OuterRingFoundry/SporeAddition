@@ -17,18 +17,30 @@ public final class FungalClientValidation {
     private static volatile boolean prepared;
     private static int phase;
     private static long deadline;
-    private static final BlockPos ORIGIN=new BlockPos(96,240,96);
+    private static volatile BlockPos ORIGIN=new BlockPos(96,240,96);
+    private static boolean spawnPending;
+    private static int settleTicks;
 
     public static void setup() {
         var mc=Minecraft.getInstance();deadline=System.nanoTime()+120_000_000_000L;
         mc.getSingleplayerServer().execute(()->{
             var server=mc.getSingleplayerServer();var level=server.getLevel(Sporebound.BLIGHT);
             var player=server.getPlayerList().getPlayers().getFirst();
+            ORIGIN=new BlockPos((player.getBlockX()>>4)*16+8,240,(player.getBlockZ()>>4)*16+8);
             level.getChunkAt(ORIGIN);level.setDayTime(6000);level.setWeatherParameters(6000,0,false,false);
             for(int x=-6;x<=6;x++)for(int z=-4;z<=9;z++) {
                 level.setBlockAndUpdate(ORIGIN.offset(x,-1,z),FungalContent.CRUST.get().defaultBlockState());
                 for(int y=0;y<5;y++)level.setBlockAndUpdate(ORIGIN.offset(x,y,z),net.minecraft.world.level.block.Blocks.AIR.defaultBlockState());
             }
+            player.setGameMode(GameType.SPECTATOR);
+            player.teleportTo(level,ORIGIN.getX(),ORIGIN.getY()+2.5,ORIGIN.getZ()+7,Set.of(),180,16);
+            CorruptionData.get(level).set(6);WorldRules.sync(player);spawnPending=true;
+        });
+    }
+    public static void serverTick(net.minecraft.server.MinecraftServer server) {
+        if(!spawnPending || ++settleTicks<40)return;
+        spawnPending=false;
+        var level=server.getLevel(Sporebound.BLIGHT);
             var donor=FungalContent.BIOMASS.get().create(level);donor.setNoAi(true);donor.setNoGravity(true);donor.setPersistenceRequired();donor.setInvulnerable(true);
             donor.moveTo(ORIGIN.getX()+1.6,ORIGIN.getY(),ORIGIN.getZ());if(!level.addFreshEntity(donor))throw new AssertionError("Display fixture spawn rejected: donor");donorId=donor.getId();
             var receiver=FungalContent.BIOMASS.get().create(level);receiver.setNoAi(true);receiver.setNoGravity(true);receiver.setPersistenceRequired();receiver.setInvulnerable(true);receiver.setMass(3);
@@ -38,10 +50,7 @@ public final class FungalClientValidation {
             if(!level.addFreshEntity(feeder))throw new AssertionError("Display fixture spawn rejected: feeder");feederId=feeder.getId();
             var food=FungalContent.BIOMASS.get().create(level);food.setNoAi(true);food.setNoGravity(true);food.setPersistenceRequired();food.setInvulnerable(true);
             food.moveTo(ORIGIN.getX()-3,ORIGIN.getY(),ORIGIN.getZ());if(!level.addFreshEntity(food))throw new AssertionError("Display fixture spawn rejected: food");foodId=food.getId();
-            player.setGameMode(GameType.SPECTATOR);
-            player.teleportTo(level,ORIGIN.getX(),ORIGIN.getY()+2.5,ORIGIN.getZ()+7,Set.of(),180,16);
-            CorruptionData.get(level).set(6);WorldRules.sync(player);prepared=true;
-        });
+        prepared=true;
     }
     public static boolean tick(BiConsumer<Boolean,String> check, Consumer<String> screenshot) {
         var mc=Minecraft.getInstance();

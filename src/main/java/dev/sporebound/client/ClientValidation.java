@@ -23,6 +23,7 @@ import net.neoforged.neoforge.client.event.ClientTickEvent;
 public final class ClientValidation {
     private static int ticks,checks;
     private static boolean finished;
+    private static long completionTick=-1;
     private static long waitingSince;
     private static volatile BlockPos departure,arrival;
     private static volatile boolean setupComplete,serverTravelReady;
@@ -34,6 +35,7 @@ public final class ClientValidation {
         serverTravelReady=!players.isEmpty()
             && !players.getFirst().getCooldowns().isOnCooldown(Sporebound.TALISMAN.get());
         ++serverTicks;
+        FungalClientValidation.serverTick(event.getServer());
     }
     @SubscribeEvent public static void tick(ClientTickEvent.Post event) {
         if(!Boolean.getBoolean("sporebound.clientValidation") || finished)return;
@@ -183,6 +185,9 @@ public final class ClientValidation {
         }
         if(ticks==920)FungalClientValidation.setup();
         if(ticks>920 && FungalClientValidation.tick(ClientValidation::check,ClientValidation::shot)){
+            if(completionTick<0)completionTick=serverTicks;
+            // Let tracking, screenshots and generation settle before exercising save-and-quit.
+            if(serverTicks-completionTick<100)return;
             try{Files.writeString(mc.gameDirectory.toPath().resolve("client-validation.json"),"{\"status\":\"passed\",\"checks\":"+checks+",\"screenshots\":10}\n");}catch(Exception error){throw new RuntimeException(error);}
             // Leave through the normal disconnect path while client tasks can still run.
             // Stopping the render loop first can strand integrated-server save work.
