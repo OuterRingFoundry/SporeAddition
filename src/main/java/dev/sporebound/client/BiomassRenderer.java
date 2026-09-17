@@ -27,7 +27,7 @@ public final class BiomassRenderer extends MobRenderer<InfectedBiomass, BiomassR
     @Override public ResourceLocation getTextureLocation(InfectedBiomass entity) { return TEXTURE; }
     @Override protected void scale(InfectedBiomass entity, PoseStack pose, float partial) {
         float size = entity.massScale();
-        float pulse = (float)Math.sin((entity.tickCount + partial) * 0.18) * 0.055F;
+        float pulse = (float)Math.sin((entity.tickCount + partial) * (entity.feeding() ? 0.5 : 0.18)) * (entity.feeding() ? 0.10F : 0.055F);
         float absorb = entity.absorbing() ? Math.max(0.12F, 1 - (entity.absorptionTicks() + partial) / InfectedBiomass.ABSORB_TICKS) : 1;
         pose.scale(size * (1 + pulse) * absorb, size * (1 - pulse * 1.8F) * absorb, size * (1 - pulse) * absorb);
     }

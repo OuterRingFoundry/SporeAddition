@@ -9,7 +9,9 @@ an official Spore release.
 
 Version 0.5.0 replaces vanilla mushrooms in corrupted biomes with Spore colonies,
 uses distinct Spore soil, adds health-scaled biomass and item feeding, enables
-pillager outposts, and lets mature Hive Minds spread underground.
+pillager outposts, biomass hunger and corpse scavenging, surplus-infected
+assimilation, and connected underground Hive networks. Corrupted Civillis
+Wilderness uses its Caution HUD status.
 See [mechanics and limits](docs/RELEASE_0.5.0.md).
 
 ## Installation
@@ -108,7 +110,7 @@ not consume Hive Mind slots. Founding is deferred in Peaceful or below index 5.
 When **Civillis** is present, its own territory transition HUD also shows
 `Corrupted territory`, `Overrun territory`, `Uncorrupted remnant`,
 `Spore-threatened territory`, `Spore-purged territory`, or `Mushroom sanctuary`
-where applicable, alongside its original label. Its HUD enable/cooldown/layout
+where applicable, alongside its original label. Corrupted Wilderness uses the Caution HUD state and label. Its HUD enable/cooldown/layout
 settings and civilization scores, towns, shrines and spawn policies are retained.
 Dormant ordinary dimensions keep the original Civillis labels.
 

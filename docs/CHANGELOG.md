@@ -4,7 +4,10 @@ Spore colonies and distinct infested soil replace vanilla mushrooms and mycelium
 in corrupted regions. Biomass yield scales with victim maximum health; lumps seek
 all dropped items, merge after an idle period, and evolve when over capacity.
 Pillager outposts join existing villages. Mature, well-fed Hive Minds develop
-persistent underground root networks. See [mechanics and validation scope](RELEASE_0.5.0.md).
+persistent underground root networks and seek connections to neighboring Hives.
+Biomass now starves gradually, scavenges native corpses/remains, weakly attacks
+prey, and assimilates surplus idle basic infected. Corrupted Civillis Wilderness
+uses the Caution HUD state. See [mechanics and validation scope](RELEASE_0.5.0.md).
 
 # 0.4.0 — fungal remnants
 

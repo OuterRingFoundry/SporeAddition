@@ -59,6 +59,25 @@ public final class HiveBurrowingValidation {
         check.accept(HiveBurrowing.grow(hive)==0,"burrowing cannot replace bedrock after a Hive moves");
         level.setBlockAndUpdate(hive.blockPosition().below(),Blocks.CHEST.defaultBlockState());
         check.accept(HiveBurrowing.grow(hive)==0,"burrowing preserves containers");
+        CorruptionData.get(level).set(8);
+        var first=Sentities.PROTO.get().create(level);first.moveTo(pos.getX()-4,pos.getY(),pos.getZ()-4);first.setNoAi(true);first.addBiomass(400);
+        var second=Sentities.PROTO.get().create(level);second.moveTo(pos.getX()+4,pos.getY(),pos.getZ()-4);second.setNoAi(true);second.addBiomass(400);
+        HiveBurrowing.data(first).putInt("Age",HiveBurrowing.MATURITY_TICKS);
+        HiveBurrowing.data(second).putInt("Age",HiveBurrowing.MATURITY_TICKS);
+        check.accept(level.addFreshEntity(first)&&level.addFreshEntity(second),"connection fixture adds two mature Hive Minds");
+        int before=first.getBiomass(),written=0;
+        for(int i=0;i<16&&!HiveBurrowing.data(first).getBoolean("Connected");i++)written+=HiveConnections.grow(first,4);
+        long[] link=HiveBurrowing.data(first).getLongArray("LinkPath");
+        check.accept(HiveBurrowing.data(first).getBoolean("Connected")&&link.length>8
+            &&HiveBurrowing.data(first).getUUID("Peer").equals(second.getUUID()),"nearby Hive Minds establish an underground connection");
+        check.accept(first.getBiomass()==before-written && Arrays.stream(link).mapToObj(BlockPos::of)
+            .allMatch(p->level.getBlockState(p).is(Sblocks.ROOTED_BIOMASS.get())),"Hive link pays for each placed tendril block");
+        CompoundTag networkSave=new CompoundTag();first.saveWithoutId(networkSave);
+        var restoredNetwork=Sentities.PROTO.get().create(level);restoredNetwork.load(networkSave);
+        check.accept(Arrays.equals(HiveBurrowing.data(restoredNetwork).getLongArray("LinkPath"),link)
+            &&HiveBurrowing.data(restoredNetwork).getUUID("Peer").equals(second.getUUID()),"Hive connection route and peer survive save/reload");
+        second.discard();HiveConnections.grow(first,4);
+        check.accept(!HiveBurrowing.data(first).hasUUID("Peer"),"removed Hive peer is released without forced chunk loading");first.discard();
         level.getGameRules().getRule(GameRules.RULE_MOBGRIEFING).set(grief,level.getServer());
         CorruptionData.get(level).set(index);
     }

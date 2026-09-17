@@ -24,6 +24,16 @@ public final class CivilisBridge {
             stateId=(int)payload.getClass().getMethod("stateId").invoke(payload);
         }catch(ReflectiveOperationException error){disable(error);}
     }
+    public static boolean caution(CorruptionPayload data) {
+        return data!=null && !data.sanctuary() && data.index()>=0 && data.regionalIndex()>=5;
+    }
+    public static Object cautionState(Object original) {
+        var mc=Minecraft.getInstance();var data=CorruptionPayload.ClientState.current;
+        if(!(original instanceof Enum<?> state) || !state.name().equals("WILDERNESS") || !caution(data)
+                || mc.level==null || !data.dimension().equals(mc.level.dimension().location()))return original;
+        try { return state.getDeclaringClass().getField("CAUTION").get(null); }
+        catch(ReflectiveOperationException error){disable(error);return original;}
+    }
     public static String territory(CorruptionPayload data) {
         if(data==null)return "";
         if(data.sanctuary())return "Mushroom sanctuary";
@@ -42,7 +52,8 @@ public final class CivilisBridge {
         if(data==null||mc.level==null||!data.dimension().equals(mc.level.dimension().location()))return original;
         String label=territory(data);
         if(label.isEmpty())return original;
-        return Component.literal(label).append(original.getString().isBlank()?Component.empty():Component.literal(" — ").append(original));
+        Component base = caution(data) && stateId==1 ? Component.translatable("civil.hud.zone_transition.caution") : original;
+        return Component.literal(label).append(base.getString().isBlank()?Component.empty():Component.literal(" — ").append(base));
     }
     @SubscribeEvent public static void tick(ClientTickEvent.Post event) {
         if(!ModList.get().isLoaded("civil")||unavailable)return;

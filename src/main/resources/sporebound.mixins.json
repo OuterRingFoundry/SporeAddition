@@ -23,6 +23,7 @@
   },
   "client": [
     "CivilisHudMixin",
-    "CorruptedSkyMixin"
+    "CorruptedSkyMixin",
+    "CivilisZoneStateMixin"
   ]
 }

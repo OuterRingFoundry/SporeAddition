@@ -66,6 +66,7 @@ public final class RuntimeValidation {
         waterAndVillages(blight);
         exposure(blight);
         FungalValidation.run(blight, RuntimeValidation::require);
+        BiomassSurvivalValidation.run(blight, RuntimeValidation::require);
         HiveBurrowingValidation.run(blight, RuntimeValidation::require);
         int founders=0;
         for(var entity:blight.getAllEntities())if(entity instanceof com.Harbinger.Spore.Sentities.Organoids.Proto)founders++;

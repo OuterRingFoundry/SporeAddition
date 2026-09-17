@@ -58,6 +58,10 @@ public final class FungalClientValidation {
             check.accept(mc.getResourceManager().getResource(Sporebound.id("textures/block/remnant_mycelium.png")).isPresent(),"remnant crust skin is present in client resources");
             check.accept(r.mass()==3,"biomass mass reaches the client");
             check.accept(r.getBbWidth()>d.getBbWidth(),"mass-dependent collision size reaches the client");
+            check.accept(CivilisBridge.caution(new CorruptionPayload(Sporebound.BLIGHT.location(),6,false,6,"Blighted Wilds"))
+                && !CivilisBridge.caution(new CorruptionPayload(Sporebound.BLIGHT.location(),6,false,2,"Remnant Grove"))
+                && !CivilisBridge.caution(new CorruptionPayload(Sporebound.BLIGHT.location(),10,true,10,"Mushroom Fields")),
+                "Caution status applies to corrupted territory and respects remnant and sanctuary exceptions");
             validateSky(check);screenshot.accept("08-fungal-remnants.png");
             phase=1;
             mc.getSingleplayerServer().execute(()->{

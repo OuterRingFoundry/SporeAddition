@@ -16,6 +16,20 @@ Minecraft 1.21.1, NeoForge 21.1.249, Java 21; requires Spore 2.2.0j on server an
 - After 30 seconds without feeding, nearby biomass gathers and merges. Mass above
   eight triggers attempts to develop into a Slasher or Brute; blocked evolution
   retains the mass and retries. Body size remains bounded during that wait.
+- Biomass follows Spore's starvation toggle and hunger duration (300 seconds by
+  default). It seeks native human/wall/frozen remains and corpse entities when
+  hungry, and can scavenge nearby dying Spore mobs. At starvation it loses one
+  mass unit every 60 seconds; only after reaching mass one can it expire, leaving
+  a Spore fungal sapling. If terrain placement is unavailable, it drops the
+  sapling item. Hunger and shrink progress persist; feeding resets both.
+- Biomass attacks eligible nearby creatures with base damage one and a six-block
+  detection range. It never attacks its Spore allies.
+- Groups of six or more fed basic infected, idle outside combat for 30 seconds,
+  have a one-in-eight chance per ten-second check to approach nearby biomass and
+  volunteer for assimilation. Evolution tiers are excluded. A two-second tendril
+  animation transfers mass without death loot; combat, damage, separation, or
+  reduced crowding cancels the transfer. Hungry infected retain their existing
+  biomass-feeding behavior.
 - Villages still generate with villagers in groves and Blighted Wilds. Pillager
   outposts now generate in groves, wilds, and highlands with vanilla inhabitants
   and spawning rules.
@@ -25,6 +39,15 @@ Minecraft 1.21.1, NeoForge 21.1.249, Java 21; requires Spore 2.2.0j on server an
   extend down and sideways through natural terrain, and expose hanging fungal
   roots in caves. Each Hive is limited to 256 nodes, 24 blocks horizontally and
   32 blocks downward. No extra Hive entities or chunk tickets are created.
+- Mature Hive Minds seek another loaded mature Hive within 64 blocks and 16 blocks
+  of vertical separation. They prioritize underground connecting tendrils before
+  expanding their own roots, sharing the four-block growth budget. Each stored
+  route is bounded to 192 blocks; searches are bounded and never load chunks.
+  Peer and route persist, broken routes are repaired or replanned, and missing
+  peers are released. Existing native Hive shelters remain available.
+- In Civillis, corrupted Wilderness displays as Caution, including its HUD semantic
+  state, with the corruption notice retained. Civilized/Shrine states, scores,
+  and server spawn policies are preserved; remnant groves and sanctuaries are exempt.
 - Underground growth respects containment, mobGriefing, bedrock, ores, fluids and
   block entities. Natural stone or soil placed by players is indistinguishable
   from natural terrain and can be colonized under those same rules.

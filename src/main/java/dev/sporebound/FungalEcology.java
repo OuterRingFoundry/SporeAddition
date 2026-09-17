@@ -51,6 +51,14 @@ public final class FungalEcology {
         if (mob instanceof Infected infected
                 && mob.goalSelector.getAvailableGoals().stream().noneMatch(g -> g.getGoal() instanceof BiomassFeedingGoal))
             mob.goalSelector.addGoal(2, new BiomassFeedingGoal(infected));
+        if(mob instanceof Infected infected && BiomassAssimilationGoal.basic(infected)
+                && mob.goalSelector.getAvailableGoals().stream().noneMatch(g->g.getGoal() instanceof BiomassAssimilationGoal))
+            mob.goalSelector.addGoal(3,new BiomassAssimilationGoal(infected));
+    }
+    @SubscribeEvent public void idle(net.neoforged.neoforge.event.tick.EntityTickEvent.Post event) {
+        if(event.getEntity() instanceof Infected infected && infected.level() instanceof ServerLevel level
+                && !infected.isNoAi() && infected.isAlive() && infected.tickCount%20==0
+                && !Protection.sterile(level,infected.blockPosition())) BiomassAssimilationGoal.age(infected);
     }
     private static final class AllCreatureTarget extends NearestAttackableTargetGoal<LivingEntity> {
         AllCreatureTarget(Mob mob) { super(mob, LivingEntity.class, 10, true, false, FungalEcology::prey); }

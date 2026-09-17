@@ -213,7 +213,7 @@ public final class ClientValidation {
             hud.getMethod("onPayload",payload).invoke(null,payload.getConstructor(long.class,int.class,String.class).newInstance(epoch,1,"Wilderness"));
             var text=hud.getDeclaredField("currentText");text.setAccessible(true);
             String label=((net.minecraft.network.chat.Component)text.get(null)).getString();
-            check(label.contains("territory")&&label.contains("Wilderness"),"Civillis native HUD retains its label and adds corruption notice: "+label);
+            check(label.contains("territory")&&label.contains("Caution"),"Civillis corrupted wilderness uses Caution and a corruption notice: "+label);
             check(epochField.getLong(null)==epoch,"corruption notices preserve Civillis notification epoch");cooldown.setInt(null,old);
         }catch(ReflectiveOperationException error){throw new RuntimeException(error);}
     }
