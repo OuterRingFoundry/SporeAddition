@@ -19,7 +19,7 @@ jobs:
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y xvfb libgl1-mesa-dri libglx-mesa0 libopenal1
-          python3 scripts/client-acceptance.py --source run-ci-core/world
+          python3 scripts/client-acceptance.py --source run-ci-core/world --civilis
       - name: Checksum validated build
         run: sha256sum build/libs/sporebound-0.5.0.jar > build/libs/sporebound-0.5.0.jar.sha256
       - uses: actions/upload-artifact@v4

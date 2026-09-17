@@ -86,11 +86,11 @@ public final class FungalValidation {
         for(int i=0;i<BiomassMath.IDLE_TICKS;i++) scavenger.tick();
         check.accept(scavenger.idleTicks()==BiomassMath.IDLE_TICKS,"idle biomass becomes ready to coalesce after thirty seconds");
         sporeFood.moveTo(scavenger.getX()+5,scavenger.getY(),scavenger.getZ());
-        scavenger.tickCount=20;
+        scavenger.setOnGround(true);scavenger.tickCount=20;
         for(int i=0;i<6;i++)scavenger.goalSelector.tick();
         check.accept(scavenger.goalSelector.getAvailableGoals().stream()
             .anyMatch(g -> g.isRunning() && g.getGoal().getClass().getSimpleName().equals("ItemForagingGoal"))
-            && !scavenger.getNavigation().isDone(),"biomass actively paths toward distant dropped Spore items");
+            && !scavenger.getNavigation().isDone(),"biomass actively paths toward distant dropped Spore items; onGround="+scavenger.onGround()+", navigation="+scavenger.getNavigation().isDone()+", goals="+scavenger.goalSelector.getAvailableGoals().stream().filter(g->g.isRunning()).map(g->g.getGoal().getClass().getSimpleName()).toList());
         scavenger.discard(); sporeFood.discard();
         var idleReceiver=create(level,pos);var idleDonor=create(level,pos.offset(1,0,0));
         var coalesce=idleDonor.goalSelector.getAvailableGoals().stream()

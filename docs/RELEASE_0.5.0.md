@@ -39,10 +39,12 @@ Minecraft 1.21.1, NeoForge 21.1.249, Java 21; requires Spore 2.2.0j on server an
   extend down and sideways through natural terrain, and expose hanging fungal
   roots in caves. Each Hive is limited to 256 nodes, 24 blocks horizontally and
   32 blocks downward. No extra Hive entities or chunk tickets are created.
-- Mature Hive Minds seek another loaded mature Hive within 64 blocks and 16 blocks
+- Mature Hive Minds seek another loaded mature Hive within 512 blocks and 64 blocks
   of vertical separation. They prioritize underground connecting tendrils before
   expanding their own roots, sharing the four-block growth budget. Each stored
-  route is bounded to 192 blocks; searches are bounded and never load chunks.
+  route is bounded to 1,024 blocks; searches are bounded and never load chunks. A route can form only while its
+  corridor is loaded. The 512-block reach accommodates Spore's default 300-block
+  spacing between naturally developing Hives.
   Peer and route persist, broken routes are repaired or replanned, and missing
   peers are released. Existing native Hive shelters remain available.
 - In Civillis, corrupted Wilderness displays as Caution, including its HUD semantic
@@ -54,5 +56,6 @@ Minecraft 1.21.1, NeoForge 21.1.249, Java 21; requires Spore 2.2.0j on server an
 
 Replace the older addon JAR on both server and clients. Publication is gated on
 compilation, unit tests, fresh-world/restart acceptance and real-client acceptance.
-Long-running balance and optional ConcentricWorld/Civillis compatibility are not
-part of this update's acceptance run.
+The real-client fixture includes the exact locked Civillis version to exercise
+Caution status. Long-running balance and the combined ConcentricWorld/Civillis
+compatibility suite are not part of this update's acceptance run.

@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
-import argparse,gzip,json,os,pathlib,shutil,signal,struct,subprocess
+import argparse,gzip,hashlib,json,os,pathlib,shutil,signal,struct,subprocess,urllib.request
 root=pathlib.Path(__file__).resolve().parents[1]
 parser=argparse.ArgumentParser()
 parser.add_argument('--source',default='run-core-final/world',help='Completed acceptance world to copy; never modified')
-parser.add_argument('--compat',action='store_true')
+deps=parser.add_mutually_exclusive_group()
+deps.add_argument('--compat',action='store_true')
+deps.add_argument('--civilis',action='store_true',help='Download the exact locked Civillis dependency for HUD validation')
 args=parser.parse_args()
 run=root/'run-client'
 if run.exists():raise SystemExit('Archive or rename the previous disposable client directory first; refusing to overwrite.')
@@ -18,6 +20,12 @@ if args.compat:
     jars=list((root/'compatibility/mods').glob('*.jar'))
     if len(jars)!=2:raise SystemExit('The two exact compatibility JARs are required.')
     for jar in jars:shutil.copy2(jar,run/'mods'/jar.name)
+if args.civilis:
+    lock=json.loads((root/'compatibility/civilis.lock.json').read_text())
+    with urllib.request.urlopen(lock['url'],timeout=60) as response: jar=response.read()
+    if hashlib.sha256(jar).hexdigest()!=lock['sha256']:raise SystemExit('Civillis dependency checksum mismatch')
+    (run/'mods').mkdir()
+    (run/'mods'/lock['filename']).write_bytes(jar)
 (run/'options.txt').write_text('tutorialStep:none\npauseOnLostFocus:false\nguiScale:2\nrenderDistance:6\nsimulationDistance:5\nmaxFps:30\nautoJump:false\n')
 env=dict(os.environ,LIBGL_ALWAYS_SOFTWARE='1')
 log=root/'client-validation.log'

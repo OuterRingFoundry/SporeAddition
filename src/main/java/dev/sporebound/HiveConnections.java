@@ -11,7 +11,7 @@ import java.util.*;
 
 /** Bounded, loaded-chunk tendrils join nearby mature Hive Minds below the surface. */
 public final class HiveConnections {
-    public static final int RANGE=64, MAX_PATH=192, SEARCH_BUDGET=2048;
+    public static final int RANGE=512, MAX_PATH=1024, SEARCH_BUDGET=2048;
     private HiveConnections() {}
     public static int grow(Proto hive,int budget) {
         if(!(hive.level() instanceof ServerLevel level) || !HiveBurrowing.mature(hive)
@@ -50,7 +50,7 @@ public final class HiveConnections {
     }
     private static boolean eligiblePeer(Proto hive,Proto other) {
         return other!=hive && other.level()==hive.level() && HiveBurrowing.mature(other)
-            && hive.distanceToSqr(other)<=RANGE*RANGE && Math.abs(hive.getY()-other.getY())<=16;
+            && hive.distanceToSqr(other)<=RANGE*RANGE && Math.abs(hive.getY()-other.getY())<=64;
     }
     static List<BlockPos> plan(ServerLevel level,BlockPos from,BlockPos to) {
         if(from.distSqr(to)>RANGE*RANGE)return List.of();

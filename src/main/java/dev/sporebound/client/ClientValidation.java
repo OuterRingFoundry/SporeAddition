@@ -210,7 +210,10 @@ public final class ClientValidation {
             var config=Class.forName("civil.config.CivilConfig");var cooldown=config.getField("zoneTransitionHudCooldownSeconds");int old=cooldown.getInt(null);cooldown.setInt(null,0);
             var hud=Class.forName("civil.civilization.ZoneTransitionHud");var epochField=hud.getDeclaredField("latestEpoch");epochField.setAccessible(true);long epoch=epochField.getLong(null);
             var payload=Class.forName("civil.civilization.ZoneTransitionPayload");
-            hud.getMethod("onPayload",payload).invoke(null,payload.getConstructor(long.class,int.class,String.class).newInstance(epoch,1,"Wilderness"));
+            var notice=payload.getConstructor(long.class,int.class,String.class).newInstance(epoch,1,"Wilderness");
+            check(((Enum<?>)payload.getMethod("state").invoke(notice)).name().equals("CAUTION"),
+                "Civillis corrupted Wilderness carries the Caution HUD semantic state");
+            hud.getMethod("onPayload",payload).invoke(null,notice);
             var text=hud.getDeclaredField("currentText");text.setAccessible(true);
             String label=((net.minecraft.network.chat.Component)text.get(null)).getString();
             check(label.contains("territory")&&label.contains("Caution"),"Civillis corrupted wilderness uses Caution and a corruption notice: "+label);
