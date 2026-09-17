@@ -16,7 +16,8 @@
     "TemplateMixin",
     "HiveAdmissionMixin",
     "HiveRemovalMixin",
-    "StructureTerrainMixin"
+    "StructureTerrainMixin",
+    "ChunkShutdownDiagnosticsMixin"
   ],
   "injectors": {
     "defaultRequire": 1
