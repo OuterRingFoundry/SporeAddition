@@ -23,7 +23,8 @@
     "HiveboundCreativeMixin",
     "HiveboundDeathMixin",
     "HiveboundAllianceMixin",
-    "HiveboundRaidMixin"
+    "HiveboundRaidMixin",
+    "HiveboundVanishingMixin"
   ],
   "injectors": {
     "defaultRequire": 1

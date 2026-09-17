@@ -43,7 +43,7 @@ public final class CivilisBridge {
         if(data.regionalIndex()>=5)return "Corrupted territory";
         if(data.region().equals("Remnant Grove"))return "Uncorrupted remnant";
         if(data.regionalIndex()>0)return "Spore-threatened territory";
-        return "Contained territory";
+        return "Normal territory";
     }
     public static Component decorate(Component original) {
         if(!resending)nativeLabel=original.copy();

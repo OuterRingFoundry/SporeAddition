@@ -143,7 +143,7 @@ existing underwater turf and damaged structures are not automatically rebuilt.
 | --- | --- |
 | -2 | Purged. Existing loaded Spore entities are discarded without drops. New entities, infection and Spore block placement/spread are blocked. Existing blocks are quarantined, not erased. |
 | -1 | Dormant. No new Spore entities, infection or Spore blocks. Previously present ordinary Spore entities freeze; bosses are removed. |
-| 0 | Contained. Ordinary Spore activity can occur, but the index cannot grow automatically. |
+| 0 | Normal. Ordinary Spore activity can occur, but the index cannot grow automatically. |
 | Above 0, below 5 | Active infection, population-driven growth, stronger mobs. No Hive Minds or Calamities. |
 | 5–10 | Hive Minds and Calamities permitted, with continuing growth and scaling. |
 
