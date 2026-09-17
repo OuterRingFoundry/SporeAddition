@@ -1,5 +1,16 @@
 # 0.5.0 — living infestation
 
+## 0.7.0 — The Collective
+
+- Shared dimension-wide Hive targeting, private Hivebound sensing and through-wall marks.
+- Evolved infection/appearance, Hyper assignments and safe native-node travel.
+- Player biomass consumption, expanded remains feeding and idle infected consolidation.
+- Deliberate Nether Star awakening from dormant Index -1 to 0.
+- Persistent survivor NPCs, nine player skins, resources, combat, shelters and patrol roads.
+- Natural founding Hive placement and vanilla-based Spore Mycelium visuals.
+- See [mechanics](RELEASE_0.7.0.md) and [validation](VALIDATION_0.7.0.md).
+
+
 Spore colonies and distinct infested soil replace vanilla mushrooms and mycelium
 in corrupted regions. Biomass yield scales with victim maximum health; lumps seek
 all dropped items, merge after an idle period, and evolve when over capacity.

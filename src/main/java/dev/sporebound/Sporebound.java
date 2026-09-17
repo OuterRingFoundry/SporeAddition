@@ -24,6 +24,12 @@ public final class Sporebound {
         Hivebound.register(bus);
         NeoForge.EVENT_BUS.register(new Hivebound());
         NeoForge.EVENT_BUS.register(new HiveboundEvolution());
+        NeoForge.EVENT_BUS.register(new HiveNetwork());
+        NeoForge.EVENT_BUS.register(new HiveProgression());
+        NeoForge.EVENT_BUS.register(new SurvivorColonies());
+        bus.addListener(HiveSensePayload::register);
+        bus.addListener(InfusionPayload::register);
+        NeoForge.EVENT_BUS.addListener(HiveCommands::register);
         bus.addListener(EvolutionPayload::register);
         NeoForge.EVENT_BUS.register(new FungalEcology());
         NeoForge.EVENT_BUS.register(new FungalForaging());

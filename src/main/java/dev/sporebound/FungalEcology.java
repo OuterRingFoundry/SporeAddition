@@ -45,6 +45,10 @@ public final class FungalEcology {
         if (!(event.getLevel() instanceof ServerLevel) || event.isCanceled()
                 || !(event.getEntity() instanceof Mob mob) || !Protection.spore(mob)
                 || mob instanceof InfectedBiomass) return;
+        if(mob.targetSelector.getAvailableGoals().stream().noneMatch(g->g.getGoal() instanceof HiveOrderGoal))
+            mob.targetSelector.addGoal(-1,new HiveOrderGoal(mob));
+        if(mob instanceof Infected infected&&mob.goalSelector.getAvailableGoals().stream().noneMatch(g->g.getGoal() instanceof SporeConsolidationGoal))
+            mob.goalSelector.addGoal(2,new SporeConsolidationGoal(infected));
         // Runtime marker, not persistent NBT: goals must be reinstalled after a save reload.
         if (mob.targetSelector.getAvailableGoals().stream().noneMatch(g -> g.getGoal() instanceof AllCreatureTarget))
             mob.targetSelector.addGoal(0, new AllCreatureTarget(mob));
@@ -60,7 +64,7 @@ public final class FungalEcology {
     @SubscribeEvent public void idle(net.neoforged.neoforge.event.tick.EntityTickEvent.Post event) {
         if(event.getEntity() instanceof Infected infected && infected.level() instanceof ServerLevel level
                 && !infected.isNoAi() && infected.isAlive() && infected.tickCount%20==0
-                && !Protection.sterile(level,infected.blockPosition())) BiomassAssimilationGoal.age(infected);
+                && !Protection.sterile(level,infected.blockPosition())) {BiomassAssimilationGoal.age(infected);SporeConsolidationGoal.age(infected);}
     }
     private static final class AllCreatureTarget extends NearestAttackableTargetGoal<LivingEntity> {
         AllCreatureTarget(Mob mob) { super(mob, LivingEntity.class, 10, true, false, FungalEcology::prey); }

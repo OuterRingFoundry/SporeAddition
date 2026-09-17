@@ -53,6 +53,7 @@ public final class FungalClientValidation {
         prepared=true;
     }
     public static boolean tick(BiConsumer<Boolean,String> check, Consumer<String> screenshot) {
+        if(phase==3)return true;
         var mc=Minecraft.getInstance();
         if(System.nanoTime()>deadline)throw new AssertionError("Timed out waiting for fungal client phase "+phase
             +"; prepared="+prepared+"; position="+(mc.player==null?null:mc.player.position())

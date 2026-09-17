@@ -25,7 +25,8 @@
     "HiveboundAllianceMixin",
     "HiveboundRaidMixin",
     "HiveboundVanishingMixin",
-    "HiveboundKillMixin"
+    "HiveboundKillMixin",
+    "ChunkUnloadBudgetMixin"
   ],
   "injectors": {
     "defaultRequire": 1
@@ -33,6 +34,7 @@
   "client": [
     "CivilisHudMixin",
     "CorruptedSkyMixin",
-    "CivilisZoneStateMixin"
+    "CivilisZoneStateMixin",
+    "HiveVisionMixin"
   ]
 }

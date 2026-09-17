@@ -34,7 +34,8 @@ public final class BiomassSurvivalValidation {
         eater=FungalContent.BIOMASS.get().create(level);eater.setNoAi(true);eater.moveTo(pos.getX(),pos.getY(),pos.getZ());level.addFreshEntity(eater);
         BlockPos food=pos.offset(1,0,0);
         level.setBlockAndUpdate(food,Sblocks.REMAINS.get().defaultBlockState());
-        check.accept(!BiomassScavengingGoal.consume(eater,food),"satiated biomass leaves native remains intact");
+        check.accept(BiomassScavengingGoal.consume(eater,food)&&level.getBlockState(food).isAir(),"growing biomass consumes remains even when satiated");
+        level.setBlockAndUpdate(food,Sblocks.REMAINS.get().defaultBlockState());
         eater.setHunger(SConfig.SERVER.hunger.get());
         boolean grief=level.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING);
         level.getGameRules().getRule(GameRules.RULE_MOBGRIEFING).set(false,level.getServer());

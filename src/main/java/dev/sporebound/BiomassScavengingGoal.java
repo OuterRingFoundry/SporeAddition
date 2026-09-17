@@ -20,12 +20,12 @@ public final class BiomassScavengingGoal extends Goal {
     private int pursuing;
     public BiomassScavengingGoal(InfectedBiomass biomass) { this.biomass=biomass;setFlags(EnumSet.of(Flag.MOVE,Flag.LOOK)); }
     public static boolean edible(BlockState state) {
-        return state.is(Sblocks.REMAINS.get()) || state.is(Sblocks.WALL_REMAINS.get())
+        return state.is(Sblocks.BRAIN_REMNANTS.get()) || state.is(Sblocks.REMAINS.get()) || state.is(Sblocks.WALL_REMAINS.get())
             || state.is(Sblocks.FROZEN_REMAINS.get()) || state.is(Sblocks.BIOMASS_BULB.get())
             || state.is(Sblocks.DROWNED_LUMP.get());
     }
     public static boolean consume(InfectedBiomass biomass,BlockPos pos) {
-        if(!(biomass.level() instanceof ServerLevel level) || !biomass.isHungry() || biomass.busy()
+        if(!(biomass.level() instanceof ServerLevel level) || !(biomass.isHungry() || biomass.mass()<InfectedBiomass.EVOLUTION_MASS) || biomass.busy()
                 || !biomass.isAlive() || !level.hasChunkAt(pos) || !pos.closerToCenterThan(biomass.position(),2.5)
                 || Protection.sterile(level,pos) || Protection.sterile(level,biomass.blockPosition())
                 || !EventHooks.canEntityGrief(level,biomass) || !edible(level.getBlockState(pos)))return false;
@@ -37,7 +37,7 @@ public final class BiomassScavengingGoal extends Goal {
     }
     public static boolean consumeCorpse(InfectedBiomass biomass,LivingEntity corpse) {
         if(!(biomass.level() instanceof ServerLevel level) || corpse.level()!=level || !biomass.isAlive()
-                || !biomass.isHungry() || biomass.busy() || corpse.isAlive() || corpse.isRemoved()
+                || !(biomass.isHungry() || biomass.mass()<InfectedBiomass.EVOLUTION_MASS) || biomass.busy() || corpse.isAlive() || corpse.isRemoved()
                 || !Protection.spore(corpse) || corpse instanceof InfectedBiomass || biomass.distanceToSqr(corpse)>6.25
                 || !biomass.hasLineOfSight(corpse) || Protection.sterile(level,corpse.blockPosition())
                 || Protection.sterile(level,biomass.blockPosition()) || !EventHooks.canEntityGrief(level,biomass))return false;
@@ -45,7 +45,7 @@ public final class BiomassScavengingGoal extends Goal {
     }
     public static boolean consumeCarcass(InfectedBiomass biomass,com.Harbinger.Spore.Sentities.Utility.CorpseEntity corpse) {
         if(!(biomass.level() instanceof ServerLevel level) || corpse.level()!=level || !biomass.isAlive()
-                || !biomass.isHungry() || biomass.busy() || corpse.isRemoved() || biomass.distanceToSqr(corpse)>6.25
+                || !(biomass.isHungry() || biomass.mass()<InfectedBiomass.EVOLUTION_MASS) || biomass.busy() || corpse.isRemoved() || biomass.distanceToSqr(corpse)>6.25
                 || !biomass.hasLineOfSight(corpse) || Protection.sterile(level,corpse.blockPosition())
                 || Protection.sterile(level,biomass.blockPosition()) || !EventHooks.canEntityGrief(level,biomass))return false;
         // Contents remain ordinary dropped items, eligible for later digestion; no duplicate inventory.
@@ -53,7 +53,7 @@ public final class BiomassScavengingGoal extends Goal {
         corpse.getInventory().clearContent();corpse.discard();biomass.nourish(1);return true;
     }
     @Override public boolean canUse() {
-        if(!biomass.isHungry() || biomass.busy() || biomass.tickCount%20!=0
+        if(!(biomass.isHungry() || biomass.mass()<InfectedBiomass.EVOLUTION_MASS) || biomass.busy() || biomass.tickCount%20!=0
                 || !(biomass.level() instanceof ServerLevel level) || Protection.sterile(level,biomass.blockPosition())
                 || !EventHooks.canEntityGrief(level,biomass))return false;
         for(var corpse:level.getEntitiesOfClass(LivingEntity.class,biomass.getBoundingBox().inflate(2.5)))
@@ -78,7 +78,7 @@ public final class BiomassScavengingGoal extends Goal {
     }
     @Override public void start(){pursuing=0;}
     @Override public boolean canContinueToUse(){
-        return biomass.isHungry() && !biomass.busy() && pursuing<200
+        return (biomass.isHungry() || biomass.mass()<InfectedBiomass.EVOLUTION_MASS) && !biomass.busy() && pursuing<200
             && (carcass!=null ? !carcass.isRemoved() && biomass.distanceToSqr(carcass)<144
                 : remains!=null && biomass.level().hasChunkAt(remains) && edible(biomass.level().getBlockState(remains)));
     }

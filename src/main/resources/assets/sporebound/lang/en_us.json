@@ -16,7 +16,7 @@
   "message.sporebound.hud_on": "Corruption bar on.",
   "message.sporebound.hud_off": "Corruption bar off.",
   "tooltip.sporebound.rift_talisman.lore": "A watching eye, listening for the world beyond.",
-  "block.sporebound.remnant_mycelium": "Remnant Mycelial Crust",
+  "block.sporebound.remnant_mycelium": "Spore Mycelium",
   "entity.sporebound.infected_biomass": "Infected Biomass",
   "item.sporebound.infected_biomass_spawn_egg": "Infected Biomass Spawn Egg",
   "item.sporebound.hivebound_helmet": "Hivebound Helmet",
@@ -25,5 +25,7 @@
   "item.sporebound.hivebound_boots": "Hivebound Boots",
   "item.sporebound.hivebound.binding": "Binds when worn. Removable only in Index -1 or -2 dimensions.",
   "item.sporebound.hivebound.symbiosis": "Full set: Spore kinship and evolution. Corruption strengthens you; clean worlds weaken you.",
-  "item.sporebound.hivebound.evolution": "Feeds on you. Earn evolution by kills; crouch + empty-hand interact to consume weaker infected."
+  "item.sporebound.hivebound.evolution": "Feeds on you. Earn evolution by kills; crouch + empty-hand interact to consume weaker infected.",
+  "entity.sporebound.survivor": "Survivor",
+  "item.sporebound.survivor_spawn_egg": "Survivor Spawn Egg"
 }

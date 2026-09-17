@@ -17,6 +17,7 @@ public final class SymbiosisClientValidation {
     private static boolean sent;
     private static volatile boolean followerChecked;
     public static boolean tick(BiConsumer<Boolean,String> check,Consumer<String> screenshot){
+        if(phase==4)return true;
         var mc=Minecraft.getInstance();
         if(phase==0){
             deadline=System.nanoTime()+120_000_000_000L;phase=1;CorruptionHud.validationGallery=true;

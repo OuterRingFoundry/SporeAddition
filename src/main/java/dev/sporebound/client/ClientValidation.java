@@ -186,10 +186,11 @@ public final class ClientValidation {
         if(ticks==920)FungalClientValidation.setup();
         if(ticks>920 && FungalClientValidation.tick(ClientValidation::check,ClientValidation::shot)){
             if(!SymbiosisClientValidation.tick(ClientValidation::check,ClientValidation::shot))return;
+            if(!CollectiveClientValidation.tick(ClientValidation::check,ClientValidation::shot))return;
             if(completionTick<0)completionTick=serverTicks;
             // Let tracking, screenshots and generation settle before exercising save-and-quit.
             if(serverTicks-completionTick<100)return;
-            try{Files.writeString(mc.gameDirectory.toPath().resolve("client-validation.json"),"{\"status\":\"passed\",\"checks\":"+checks+",\"screenshots\":13}\n");}catch(Exception error){throw new RuntimeException(error);}
+            try{Files.writeString(mc.gameDirectory.toPath().resolve("client-validation.json"),"{\"status\":\"passed\",\"checks\":"+checks+",\"screenshots\":15}\n");}catch(Exception error){throw new RuntimeException(error);}
             // Leave through the normal disconnect path while client tasks can still run.
             // Stopping the render loop first can strand integrated-server save work.
             finished=true;

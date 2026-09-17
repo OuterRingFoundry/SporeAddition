@@ -5,6 +5,14 @@ It adds a corrupted Overworld-like dimension, per-dimension corruption, and perm
 Spore protection for Overworld mushroom islands. This is an independent addon, not
 an official Spore release.
 
+## Sporebound 0.7.0
+
+Version 0.7.0 adds shared Hive intelligence and private Hivebound sight, node travel,
+infused player appearance and infectious melee, a deliberate awakening ritual,
+idle infected consolidation, and persistent survivor colonies. Founding hives use
+natural terrain, and Spore Mycelium uses vanilla mycelium textures. See
+[0.7.0 mechanics and controls](docs/RELEASE_0.7.0.md).
+
 ## Sporebound 0.6.0
 
 Version 0.6.0 adds cooperative Hive biomass sharing, craftable Hivebound armor with dimension-dependent binding, Spore kinship, evolution and followers, and an Index bar that visibly decays from meadow to infestation. See [recipes and mechanics](docs/RELEASE_0.6.0.md).
@@ -18,8 +26,8 @@ See [mechanics and limits](docs/RELEASE_0.5.0.md).
 
 ## Installation
 
-Download `sporebound-0.6.0.jar` and its SHA-256 checksum from the
-[0.6.0 release](https://github.com/OuterRingFoundry/SporeAddition/releases/tag/v0.6.0).
+Use the built `sporebound-0.7.0.jar` and its SHA-256 checksum.
+The complete controls and progression are in [the release notes](docs/RELEASE_0.7.0.md).
 Replace the older Sporebound JAR on both server and clients; keep only one version.
 
 
@@ -148,8 +156,9 @@ existing underwater turf and damaged structures are not automatically rebuilt.
 | 5–10 | Hive Minds and Calamities permitted, with continuing growth and scaling. |
 
 The Overworld, Nether, End and other external dimensions default to **-1**. The
-Blighted World defaults to **6**. Only explicit OP commands unlock negative states.
-Gameplay never increases -2, -1 or 0. Mushroom fields remain immune at every index.
+Blighted World defaults to **6**. Index -1 can be unlocked deliberately by the two-step Nether Star cairn ritual;
+-2 requires an OP command. Evolved Hivebound melee infections can raise Index 0.
+Population growth alone never increases -2, -1 or 0. Mushroom fields remain immune at every index.
 Spore structures and template placement are confined to the Blighted World even
 when another dimension is activated by an operator.
 

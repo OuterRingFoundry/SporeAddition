@@ -72,6 +72,7 @@ public final class InfectedBiomass extends PathfinderMob {
         goalSelector.addGoal(4, new CoalesceGoal());
         goalSelector.addGoal(5, new WaterAvoidingRandomStrollGoal(this, 0.8));
         goalSelector.addGoal(6, new RandomLookAroundGoal(this));
+        targetSelector.addGoal(-1,new HiveOrderGoal(this));
         targetSelector.addGoal(1, new net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal<>(
             this, LivingEntity.class, 40, true, false, target -> !busy() && FungalEcology.prey(target)));
     }

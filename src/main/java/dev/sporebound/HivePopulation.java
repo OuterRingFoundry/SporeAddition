@@ -58,6 +58,7 @@ public final class HivePopulation extends SavedData {
         int limit=CorruptionMath.hiveLimit(CorruptionData.get(level).index());
         while(active.size()>limit){var id=active.getLast();active.remove(id);retired.add(id);setDirty();}
     }
+    public boolean contains(UUID id){return active.contains(id)&&!retired.contains(id);}
     public int count(){return active.size();}
     public boolean retired(UUID id){return retired.contains(id);}
     public boolean allows(ServerLevel level,UUID id) {
@@ -69,6 +70,7 @@ public final class HivePopulation extends SavedData {
     public static void added(Entity entity) {
         if(entity instanceof Proto&&entity.level() instanceof ServerLevel level) {
             var data=get(level);if(data.active.add(entity.getUUID()))data.setDirty();
+            HiveNodes.get(level).rememberHive((Proto)entity);
         }
     }
     public static void removed(Entity entity,Entity.RemovalReason reason) {

@@ -69,6 +69,7 @@ public final class RuntimeValidation {
         BiomassSurvivalValidation.run(blight, RuntimeValidation::require);
         HiveBurrowingValidation.run(blight, RuntimeValidation::require);
         HiveboundValidation.run(blight, RuntimeValidation::require);
+        CollectiveValidation.run(blight, RuntimeValidation::require);
         int founders=0;
         for(var entity:blight.getAllEntities())if(entity instanceof com.Harbinger.Spore.Sentities.Organoids.Proto)founders++;
         require(founders==1,"exactly one initial Hive Mind: "+founders);
@@ -325,6 +326,7 @@ public final class RuntimeValidation {
         require(!HivePopulation.get(nether).allows(nether,UUID.randomUUID()),"unloaded hives prevent extra spawn after restart");
         var blight=server.getLevel(Sporebound.BLIGHT);
         require(CorruptionData.get(blight).index()==4.25,"custom index survives restart");
+        require(!SurvivorColonies.get(blight).homes().isEmpty(),"survivor colony ledger survives process restart");
         for(int i=0;i<FoundingHives.SITES.length;i++)require(CorruptionData.get(blight).seeded(i),"founder marker survives restart "+i);
         require(RiftCairn.complete(blight,ArrivalData.get(blight).center(blight)),"arrival cairn and coordinate survive restart");
         set(blight,6);FoundingHives.seed(blight);
