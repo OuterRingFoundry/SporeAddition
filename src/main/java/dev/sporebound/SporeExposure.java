@@ -11,7 +11,7 @@ public final class SporeExposure {
     public static boolean hazardous(ServerPlayer player) {
         return player.level().dimension().equals(Sporebound.BLIGHT)
             &&CorruptionMath.hazardousFog(RegionalCorruption.at(player.serverLevel(),player.blockPosition()))
-            &&!player.isCreative()&&!player.isSpectator()&&player.isAlive()
+            &&!Hivebound.member(player)&&!player.isCreative()&&!player.isSpectator()&&player.isAlive()
             &&!player.isUnderWater()&&!player.isInLava()
             &&player.getEyeY()>=player.level().getHeight(
                 net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,

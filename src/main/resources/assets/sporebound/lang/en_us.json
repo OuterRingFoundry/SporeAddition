@@ -18,5 +18,11 @@
   "tooltip.sporebound.rift_talisman.lore": "A watching eye, listening for the world beyond.",
   "block.sporebound.remnant_mycelium": "Remnant Mycelial Crust",
   "entity.sporebound.infected_biomass": "Infected Biomass",
-  "item.sporebound.infected_biomass_spawn_egg": "Infected Biomass Spawn Egg"
+  "item.sporebound.infected_biomass_spawn_egg": "Infected Biomass Spawn Egg",
+  "item.sporebound.hivebound_helmet": "Hivebound Helmet",
+  "item.sporebound.hivebound_chestplate": "Hivebound Chestplate",
+  "item.sporebound.hivebound_leggings": "Hivebound Leggings",
+  "item.sporebound.hivebound_boots": "Hivebound Boots",
+  "item.sporebound.hivebound.binding": "Binds when worn. Removable only in Index -1 or -2 dimensions.",
+  "item.sporebound.hivebound.symbiosis": "Full set: Spore kinship. Corruption strengthens you; clean worlds weaken you."
 }

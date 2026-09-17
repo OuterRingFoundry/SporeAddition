@@ -17,7 +17,13 @@
     "HiveAdmissionMixin",
     "HiveRemovalMixin",
     "StructureTerrainMixin",
-    "ChunkShutdownDiagnosticsMixin"
+    "ChunkShutdownDiagnosticsMixin",
+    "HiveboundSlotMixin",
+    "HiveboundEquipMixin",
+    "HiveboundCreativeMixin",
+    "HiveboundDeathMixin",
+    "HiveboundAllianceMixin",
+    "HiveboundRaidMixin"
   ],
   "injectors": {
     "defaultRequire": 1

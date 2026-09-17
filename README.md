@@ -5,7 +5,9 @@ It adds a corrupted Overworld-like dimension, per-dimension corruption, and perm
 Spore protection for Overworld mushroom islands. This is an independent addon, not
 an official Spore release.
 
-## Sporebound 0.5.0
+## Sporebound 0.6.0
+
+Version 0.6.0 adds cooperative Hive biomass sharing, craftable Hivebound armor with dimension-dependent binding and Spore kinship, and an Index bar that visibly decays from meadow to infestation. See [recipes and mechanics](docs/RELEASE_0.6.0.md).
 
 Version 0.5.0 replaces vanilla mushrooms in corrupted biomes with Spore colonies,
 uses distinct Spore soil, adds health-scaled biomass and item feeding, enables
@@ -16,8 +18,8 @@ See [mechanics and limits](docs/RELEASE_0.5.0.md).
 
 ## Installation
 
-Download `sporebound-0.5.0.jar` and its SHA-256 checksum from the
-[0.5.0 release](https://github.com/OuterRingFoundry/SporeAddition/releases/tag/v0.5.0).
+Download `sporebound-0.6.0.jar` and its SHA-256 checksum from the
+[0.6.0 release](https://github.com/OuterRingFoundry/SporeAddition/releases/tag/v0.6.0).
 Replace the older Sporebound JAR on both server and clients; keep only one version.
 
 

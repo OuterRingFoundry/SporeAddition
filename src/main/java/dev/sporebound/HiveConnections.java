@@ -49,7 +49,9 @@ public final class HiveConnections {
         return placed;
     }
     private static boolean eligiblePeer(Proto hive,Proto other) {
-        return other!=hive && other.level()==hive.level() && HiveBurrowing.mature(other)
+        return other!=hive && other.level()==hive.level() && other.isAlive() && !Protection.sterile((ServerLevel) other.level(),other.blockPosition())
+            && HiveBurrowing.data(other).getInt("Age")>=HiveBurrowing.MATURITY_TICKS
+            && RegionalCorruption.at((ServerLevel)other.level(),other.blockPosition())>=7
             && hive.distanceToSqr(other)<=RANGE*RANGE && Math.abs(hive.getY()-other.getY())<=64;
     }
     static List<BlockPos> plan(ServerLevel level,BlockPos from,BlockPos to) {

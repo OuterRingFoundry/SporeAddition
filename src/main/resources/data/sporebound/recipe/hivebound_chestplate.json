@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:smithing_transform",
+  "template": {
+    "item": "spore:living_core"
+  },
+  "base": {
+    "item": "spore:living_chest"
+  },
+  "addition": {
+    "item": "spore:reforged_biomass_a"
+  },
+  "result": {
+    "id": "sporebound:hivebound_chestplate",
+    "count": 1
+  }
+}

@@ -36,7 +36,7 @@ public final class FungalEcology {
     }
     public static boolean prey(LivingEntity entity) {
         return entity.isAlive() && !entity.isInvulnerable() && !entity.isSpectator()
-            && !(entity instanceof ArmorStand) && !Protection.spore(entity)
+            && !(entity instanceof ArmorStand) && !Protection.spore(entity) && !Hivebound.member(entity)
             && !(entity instanceof UtilityEntity) && !(entity instanceof TrueCalamity)
             && !(entity instanceof Player player && player.isCreative())
             && (!(entity.level() instanceof ServerLevel level) || !Protection.sterile(level, entity.blockPosition()));

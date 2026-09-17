@@ -26,7 +26,7 @@ public final class HiveBurrowing {
                 || Protection.sterile(level, hive.blockPosition()) || hive.tickCount % 20 != 0) return;
         var data = data(hive);
         data.putInt("Age", Math.min(MATURITY_TICKS, data.getInt("Age") + 20));
-        if (hive.tickCount % 200 == 0) grow(hive);
+        if (hive.tickCount % 200 == 0) { HiveResources.develop(hive); grow(hive); }
     }
     static CompoundTag data(Proto hive) {
         var persistent = hive.getPersistentData();

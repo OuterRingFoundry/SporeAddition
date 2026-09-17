@@ -21,6 +21,8 @@ public final class Sporebound {
     public Sporebound(IEventBus bus) {
         ITEMS.register(bus);FEATURES.register(bus);
         FungalContent.register(bus);
+        Hivebound.register(bus);
+        NeoForge.EVENT_BUS.register(new Hivebound());
         NeoForge.EVENT_BUS.register(new FungalEcology());
         NeoForge.EVENT_BUS.register(new FungalForaging());
         NeoForge.EVENT_BUS.register(new HiveBurrowing());

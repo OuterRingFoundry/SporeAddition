@@ -2,6 +2,7 @@ package dev.sporebound;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 class CorruptionMathTest {
+    @Test void zeroIsNormal(){assertEquals("NORMAL",CorruptionMath.state(0));}
     @Test void lockedStatesNeverGrow() {
         for (double n : new double[]{-2,-1,0}) for (int weight : new int[]{0,1,100,1000000})
             assertEquals(n, CorruptionMath.advance(n, weight, 1200));

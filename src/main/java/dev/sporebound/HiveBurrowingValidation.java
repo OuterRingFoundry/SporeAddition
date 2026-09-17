@@ -72,6 +72,34 @@ public final class HiveBurrowingValidation {
             &&HiveBurrowing.data(first).getUUID("Peer").equals(second.getUUID()),"nearby Hive Minds establish an underground connection");
         check.accept(first.getBiomass()==before-written && Arrays.stream(link).mapToObj(BlockPos::of)
             .allMatch(p->level.getBlockState(p).is(Sblocks.ROOTED_BIOMASS.get())),"Hive link pays for each placed tendril block");
+        second.eatBiomass(second.getBiomass()-40);
+        int sum=first.getBiomass()+second.getBiomass();
+        check.accept(HiveResources.connected(first,second)&&HiveResources.connected(second,first),"completed Hive links carry resources in both directions");
+        int sent=HiveResources.share(first);
+        check.accept(sent==20&&second.getBiomass()==60&&first.getBiomass()+second.getBiomass()==sum,
+            "Hive transfer uses native biomass points and conserves total resources");
+        first.setHealth(first.getMaxHealth()/2);
+        check.accept(HiveResources.share(first)==0,"injured Hive keeps biomass for its own development");
+        first.setHealth(first.getMaxHealth());
+        first.setTarget(net.minecraft.world.entity.EntityType.COW.create(level));
+        check.accept(HiveResources.share(first)==0,"Hive in combat retains its biomass reserve");first.setTarget(null);
+        var broken=BlockPos.of(link[link.length/2]);
+        level.setBlockAndUpdate(broken,Blocks.AIR.defaultBlockState());
+        check.accept(!HiveResources.connected(first,second)&&HiveResources.share(first)==0,"broken tendrils cannot transport biomass");
+        level.setBlockAndUpdate(broken,Sblocks.ROOTED_BIOMASS.get().defaultBlockState());
+        second.moveTo(second.getX()+1,second.getY(),second.getZ());
+        check.accept(!HiveResources.connected(first,second),"moved Hive cannot use its old connection");
+        second.moveTo(second.getX()-1,second.getY(),second.getZ());
+        for(int i=0;i<30;i++)HiveResources.share(first);
+        check.accept(first.getBiomass()>=HiveResources.RESERVE&&second.getBiomass()<=HiveResources.RESERVE
+            &&first.getBiomass()+second.getBiomass()==sum,"repeated sharing retains development reserve without minting points");
+        first.eatBiomass(first.getBiomass()-20);
+        var host=Sentities.INF_HUMAN.get().create(level);host.moveTo(first.position());host.setNoAi(true);host.setKills(7);
+        check.accept(level.addFreshEntity(host),"native biomass collection fixture joins");
+        check.accept(HiveResources.gather(first)==7&&first.getBiomass()==27&&host.getKills()==0&&host.isAlive(),
+            "developing Hive gathers native kill points exactly once without consuming a productive host");
+        host.discard();
+        first.addBiomass(300);second.addBiomass(200);
         CompoundTag networkSave=new CompoundTag();first.saveWithoutId(networkSave);
         var restoredNetwork=Sentities.PROTO.get().create(level);restoredNetwork.load(networkSave);
         check.accept(Arrays.equals(HiveBurrowing.data(restoredNetwork).getLongArray("LinkPath"),link)

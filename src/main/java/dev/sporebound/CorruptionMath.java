@@ -24,7 +24,7 @@ public final class CorruptionMath {
     public static String state(double index) {
         if (index == -2) return "PURGED";
         if (index == -1) return "DORMANT";
-        if (index == 0) return "CONTAINED";
+        if (index == 0) return "NORMAL";
         if (index < 5) return "INCUBATING";
         if (index < 8) return "HIVE AWAKENED";
         return "OVERRUN";
