@@ -27,8 +27,10 @@ public final class Protection {
     public static boolean mushroom(Level level, BlockPos pos) {
         if (!level.dimension().equals(Level.OVERWORLD)) return false;
         // Protect the entire mushroom-island column, including its caves and buildings.
-        return level.getBiome(pos).is(Biomes.MUSHROOM_FIELDS)
-            || level.getBiome(new BlockPos(pos.getX(), 64, pos.getZ())).is(Biomes.MUSHROOM_FIELDS);
+        var surface=new BlockPos(pos.getX(),64,pos.getZ());
+        if(level instanceof ServerLevel server)return RegionalCorruption.biomeAt(server,pos).is(Biomes.MUSHROOM_FIELDS)
+            || RegionalCorruption.biomeAt(server,surface).is(Biomes.MUSHROOM_FIELDS);
+        return level.getBiome(pos).is(Biomes.MUSHROOM_FIELDS)||level.getBiome(surface).is(Biomes.MUSHROOM_FIELDS);
     }
     public static boolean sterile(ServerLevel level, BlockPos pos) {
         return CorruptionData.get(level).index() < 0 || mushroom(level, pos);

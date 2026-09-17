@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import argparse,gzip,hashlib,json,os,pathlib,shutil,signal,struct,subprocess,urllib.request
+import argparse,gzip,hashlib,json,os,pathlib,shutil,signal,struct,subprocess,time,urllib.request
 root=pathlib.Path(__file__).resolve().parents[1]
 parser=argparse.ArgumentParser()
 parser.add_argument('--source',default='run-core-final/world',help='Completed acceptance world to copy; never modified')
@@ -33,7 +33,15 @@ timed_out=False
 with log.open('w') as out:
     process=subprocess.Popen(['xvfb-run','-a','-s','-screen 0 1280x720x24','bash','gradlew','--no-daemon','runClient','-PclientValidation'],cwd=root,env=env,stdout=out,stderr=subprocess.STDOUT,start_new_session=True)
     try:
-        process.wait(timeout=600)
+        deadline=time.monotonic()+600
+        shutdown_deadline=None
+        while process.poll() is None:
+            if (run/'client-validation.json').is_file() and shutdown_deadline is None:
+                shutdown_deadline=time.monotonic()+60
+            remaining=min(deadline,shutdown_deadline or deadline)-time.monotonic()
+            if remaining<=0:raise subprocess.TimeoutExpired(process.args,600 if shutdown_deadline is None else 60)
+            try:process.wait(timeout=min(1,remaining))
+            except subprocess.TimeoutExpired:pass
     except subprocess.TimeoutExpired:
         timed_out=True
         # Preserve thread stacks before stopping a stalled game or Gradle process.
@@ -54,7 +62,7 @@ with log.open('w') as out:
             os.killpg(process.pid,signal.SIGKILL)
             process.wait()
 text=log.read_text(errors='replace')
-if timed_out:print('Client acceptance exceeded its 600-second deadline; process group stopped.')
+if timed_out:print('Client acceptance exceeded its startup/test or 60-second shutdown deadline; process group stopped.')
 assert not timed_out and process.returncode==0 and 'SPOREBOUND CLIENT ACCEPTANCE PASS' in text, '\n'.join(line for line in text.splitlines() if any(word in line for word in ['AssertionError', 'CHECK PASS', 'Caused by:', 'Exception']))+'\n'+text[-10000:]
 for name in ['01-dormant','02-blighted-world','03-overrun','04-return','05-remnant-grove','06-ribbed-highlands','07-hud-off','08-fungal-remnants','09-biomass-absorption','10-biomass-integrated']:
     assert (run/'screenshots'/(name+'.png')).is_file(),name

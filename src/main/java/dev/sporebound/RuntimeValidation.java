@@ -258,6 +258,17 @@ public final class RuntimeValidation {
         var generator=blight.getChunkSource().getGenerator();
         require(generator instanceof net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator noise
             &&noise.generatorSettings().is(Sporebound.id("blighted_world")),"dedicated folded-terrain noise settings selected");
+        var remote=new BlockPos(12000000,80,12000000);
+        for(var sample:java.util.List.of(blight,overworld)) {
+            var source=sample.getChunkSource();
+            require(source.getChunk(remote.getX()>>4,remote.getZ()>>4,net.minecraft.world.level.chunk.status.ChunkStatus.EMPTY,false)==null,
+                "remote biome fixture starts unloaded: "+sample.dimension().location());
+            var expected=source.getGenerator().getBiomeSource().getNoiseBiome(remote.getX()>>2,remote.getY()>>2,remote.getZ()>>2,source.randomState().sampler());
+            require(RegionalCorruption.biomeAt(sample,remote).equals(expected),"unloaded biome lookup matches generator");
+            RegionalCorruption.at(sample,remote);RegionalCorruption.name(sample,remote);Protection.mushroom(sample,remote);
+            require(source.getChunk(remote.getX()>>4,remote.getZ()>>4,net.minecraft.world.level.chunk.status.ChunkStatus.EMPTY,false)==null,
+                "containment and regional checks never load remote chunks");
+        }
         var regions=new java.util.HashSet<ResourceLocation>();int low=320,high=-64;
         for(int x=-1536;x<=1536;x+=384)for(int z=-1536;z<=1536;z+=384) {
             var biome=generator.getBiomeSource().getNoiseBiome(x>>2,20,z>>2,blight.getChunkSource().randomState().sampler());
