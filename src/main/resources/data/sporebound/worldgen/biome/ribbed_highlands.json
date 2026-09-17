@@ -78,8 +78,7 @@
       "minecraft:spring_lava"
     ],
     [
-      "minecraft:brown_mushroom_normal",
-      "minecraft:red_mushroom_normal"
+      "sporebound:spore_colonies"
     ],
     [
       "minecraft:freeze_top_layer"

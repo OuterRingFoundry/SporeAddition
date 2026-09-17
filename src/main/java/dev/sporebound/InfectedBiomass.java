@@ -22,12 +22,13 @@ import java.util.EnumSet;
 
 /** A mobile fungal remnant. Assimilation uses no damage, death event or loot. */
 public final class InfectedBiomass extends PathfinderMob {
-    public static final int EVOLUTION_MASS = 8, ABSORB_TICKS = 40;
+    public static final int EVOLUTION_MASS = BiomassMath.MAX_SIZE_MASS + 1, ABSORB_TICKS = 40;
     private static final EntityDataAccessor<Integer> MASS = SynchedEntityData.defineId(InfectedBiomass.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> RECIPIENT = SynchedEntityData.defineId(InfectedBiomass.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> PROGRESS = SynchedEntityData.defineId(InfectedBiomass.class, EntityDataSerializers.INT);
     private String origin = "";
     private int evolveCooldown;
+    private int idleTicks;
 
     public InfectedBiomass(EntityType<? extends InfectedBiomass> type, Level level) { super(type, level); }
     public static AttributeSupplier.Builder attributes() {
@@ -38,14 +39,29 @@ public final class InfectedBiomass extends PathfinderMob {
         super.defineSynchedData(builder); builder.define(MASS, 1); builder.define(RECIPIENT, -1); builder.define(PROGRESS, 0);
     }
     public int mass() { return entityData.get(MASS); }
-    public void setMass(int value) { entityData.set(MASS, Math.clamp(value, 1, EVOLUTION_MASS)); }
+    public void setMass(int value) {
+        float fraction = getMaxHealth() > 0 ? getHealth() / getMaxHealth() : 1;
+        entityData.set(MASS, Math.clamp(value, 1, BiomassMath.MAX_SIZE_MASS * 2));
+        getAttribute(Attributes.MAX_HEALTH).setBaseValue(12 * mass());
+        setHealth(getMaxHealth() * fraction);
+    }
+    public float massScale() { return BiomassMath.scale(mass()); }
+    public int idleTicks() { return idleTicks; }
+    @Override public EntityDimensions getDefaultDimensions(Pose pose) {
+        return super.getDefaultDimensions(pose).scale(massScale());
+    }
+    @Override public void onSynchedDataUpdated(EntityDataAccessor<?> key) {
+        super.onSynchedDataUpdated(key);
+        if (MASS.equals(key)) refreshDimensions();
+    }
     public int absorptionTicks() { return entityData.get(PROGRESS); }
     public boolean absorbing() { return entityData.get(RECIPIENT) >= 0; }
     public void setOrigin(String value) { origin = value; }
     public String origin() { return origin; }
     @Override protected void registerGoals() {
         goalSelector.addGoal(0, new FloatGoal(this));
-        goalSelector.addGoal(1, new CoalesceGoal());
+        goalSelector.addGoal(1, new ItemForagingGoal());
+        goalSelector.addGoal(2, new CoalesceGoal());
         goalSelector.addGoal(4, new WaterAvoidingRandomStrollGoal(this, 0.8));
         goalSelector.addGoal(5, new RandomLookAroundGoal(this));
     }
@@ -73,12 +89,17 @@ public final class InfectedBiomass extends PathfinderMob {
                 || !(level() instanceof ServerLevel server) || Protection.sterile(server, blockPosition())
                 || Protection.sterile(server, target.blockPosition())) return false;
         if (target instanceof InfectedBiomass biomass)
-            return !biomass.absorbing() && biomass.mass() + mass() <= EVOLUTION_MASS;
+            return !biomass.absorbing() && biomass.mass() + mass() <= BiomassMath.MAX_SIZE_MASS * 2;
         return target instanceof Infected infected && infected.isStarving();
     }
     @Override public void tick() {
         super.tick();
-        if (!(level() instanceof ServerLevel server) || !isAlive()) return;
+        if (!(level() instanceof ServerLevel server) || !isAlive() || Protection.sterile(server, blockPosition())) return;
+        boolean beingAbsorbedInto = receiving();
+        if (beingAbsorbedInto) {
+            getNavigation().stop();
+            setDeltaMovement(getDeltaMovement().multiply(0.15, 1, 0.15));
+        } else if (!absorbing()) idleTicks = Math.min(BiomassMath.IDLE_TICKS, idleTicks + 1);
         if (absorbing()) {
             Entity entity = server.getEntity(entityData.get(RECIPIENT));
             if (!(entity instanceof Mob recipient) || !validRecipient(recipient)) { cancelAbsorption(); return; }
@@ -95,7 +116,7 @@ public final class InfectedBiomass extends PathfinderMob {
                 }
             }
             if (step >= ABSORB_TICKS) {
-                if (recipient instanceof InfectedBiomass biomass) { biomass.setMass(biomass.mass() + mass()); biomass.heal(mass() * 2); }
+                if (recipient instanceof InfectedBiomass biomass) { biomass.setMass(biomass.mass() + mass()); biomass.heal(mass() * 2); biomass.idleTicks = 0; }
                 else if (recipient instanceof Infected infected) {
                     infected.setHunger(0); infected.removeEffect(Seffects.STARVATION);
                     infected.setEvoPoints(infected.getEvoPoints() + mass()); infected.heal(mass() * 2);
@@ -103,14 +124,14 @@ public final class InfectedBiomass extends PathfinderMob {
                 recipient.playSound(SoundEvents.SLIME_SQUISH, 0.7F, 0.7F);
                 discard();
             }
-        } else if (mass() >= EVOLUTION_MASS && --evolveCooldown <= 0) {
+        } else if (!isNoAi() && !beingAbsorbedInto && mass() >= EVOLUTION_MASS && --evolveCooldown <= 0) {
             evolveCooldown = 100;
             evolve(server);
         }
     }
     private void cancelAbsorption() { entityData.set(RECIPIENT, -1); entityData.set(PROGRESS, 0); }
     public boolean evolve(ServerLevel server) {
-        if (mass() < EVOLUTION_MASS || absorbing() || !isAlive() || Protection.sterile(server, blockPosition())) return false;
+        if (mass() < EVOLUTION_MASS || absorbing() || receiving() || !isAlive() || Protection.sterile(server, blockPosition())) return false;
         EntityType<?> type = random.nextBoolean() ? com.Harbinger.Spore.core.Sentities.SLASHER.get() : com.Harbinger.Spore.core.Sentities.BRUTE.get();
         Entity result = type.create(server);
         if (!(result instanceof Infected infected)) return false;
@@ -118,28 +139,82 @@ public final class InfectedBiomass extends PathfinderMob {
         if (!server.noCollision(infected)) return false;
         infected.finalizeSpawn(server, server.getCurrentDifficultyAt(blockPosition()), MobSpawnType.CONVERSION, null);
         infected.setCustomName(getCustomName()); infected.setPersistenceRequired(); infected.setHunger(0);
+        infected.setEvoPoints(infected.getEvoPoints() + mass());
         if (!server.addFreshEntity(infected)) return false;
         playSound(SoundEvents.SLIME_SQUISH, 1, 0.4F); discard(); return true;
     }
     @Override public void addAdditionalSaveData(CompoundTag tag) {
-        super.addAdditionalSaveData(tag); tag.putInt("BiomassMass", mass()); tag.putString("BiomassOrigin", origin);
+        super.addAdditionalSaveData(tag); tag.putInt("BiomassMass", mass()); tag.putString("BiomassOrigin", origin); tag.putInt("BiomassIdle", idleTicks);
         // An interrupted animation restarts after reload; it never persists half a transfer.
     }
     @Override public void readAdditionalSaveData(CompoundTag tag) {
-        super.readAdditionalSaveData(tag); setMass(tag.getInt("BiomassMass")); origin = tag.getString("BiomassOrigin"); cancelAbsorption();
+        super.readAdditionalSaveData(tag); setMass(tag.getInt("BiomassMass")); origin = tag.getString("BiomassOrigin");
+        idleTicks = Math.clamp(tag.getInt("BiomassIdle"), 0, BiomassMath.IDLE_TICKS); cancelAbsorption();
+    }
+    /** Every dropped item is food, including non-food and Spore items. */
+    public boolean digest(net.minecraft.world.entity.item.ItemEntity item) {
+        if (!(level() instanceof ServerLevel server) || !isAlive() || absorbing() || receiving()
+                || mass() >= EVOLUTION_MASS || !edible(item) || distanceToSqr(item) > 2.25
+                || !hasLineOfSight(item) || Protection.sterile(server, blockPosition())
+                || Protection.sterile(server, item.blockPosition())
+                || !net.neoforged.neoforge.event.EventHooks.canEntityGrief(server, this)) return false;
+        var bite = item.getItem().copyWithCount(1);
+        var remainder = item.getItem().copy(); remainder.shrink(1);
+        if (remainder.isEmpty()) item.discard(); else item.setItem(remainder);
+        setMass(mass() + 1); heal(4); idleTicks = 0;
+        server.sendParticles(new net.minecraft.core.particles.ItemParticleOption(
+            net.minecraft.core.particles.ParticleTypes.ITEM, bite), getX(), getEyeY(), getZ(), 8, 0.2, 0.1, 0.2, 0.03);
+        playSound(SoundEvents.GENERIC_EAT, 0.6F, 0.7F);
+        return true;
+    }
+    private boolean edible(net.minecraft.world.entity.item.ItemEntity item) {
+        return item.level() == level() && item.isAlive() && !item.hasPickUpDelay() && !item.getItem().isEmpty();
+    }
+    private final class ItemForagingGoal extends Goal {
+        private net.minecraft.world.entity.item.ItemEntity food;
+        private int pursuing;
+        ItemForagingGoal() { setFlags(EnumSet.of(Flag.MOVE, Flag.LOOK)); }
+        @Override public boolean canUse() {
+            if (absorbing() || receiving() || mass() >= EVOLUTION_MASS || tickCount % 20 != 0
+                    || !(level() instanceof ServerLevel server) || Protection.sterile(server, blockPosition())
+                    || !net.neoforged.neoforge.event.EventHooks.canEntityGrief(server, InfectedBiomass.this)) return false;
+            food = level().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class, getBoundingBox().inflate(12),
+                i -> edible(i) && !Protection.sterile(server, i.blockPosition()) && hasLineOfSight(i)).stream()
+                .sorted(Comparator.comparingDouble(InfectedBiomass.this::distanceToSqr))
+                .filter(i -> { var path = getNavigation().createPath(i, 0); return path != null && path.canReach(); })
+                .findFirst().orElse(null);
+            return food != null;
+        }
+        @Override public void start() { pursuing = 0; }
+        @Override public boolean canContinueToUse() {
+            return food != null && edible(food) && !absorbing() && !receiving() && mass() < EVOLUTION_MASS
+                && distanceToSqr(food) < 256 && pursuing < 200;
+        }
+        @Override public void tick() {
+            pursuing++;
+            getLookControl().setLookAt(food, 30, 30);
+            if (distanceToSqr(food) <= 2.25) {
+                getNavigation().stop();
+                if (tickCount % 20 == 0) digest(food);
+            } else if (tickCount % 10 == 0) getNavigation().moveTo(food, 1);
+        }
+        @Override public void stop() { food = null; getNavigation().stop(); }
     }
     private final class CoalesceGoal extends Goal {
         private InfectedBiomass other;
         CoalesceGoal() { setFlags(EnumSet.of(Flag.MOVE)); }
         @Override public boolean canUse() {
-            if (absorbing() || tickCount % 20 != 0 || mass() >= EVOLUTION_MASS) return false;
+            if (absorbing() || receiving() || idleTicks < BiomassMath.IDLE_TICKS || tickCount % 20 != 0 || mass() >= EVOLUTION_MASS) return false;
             other = level().getEntitiesOfClass(InfectedBiomass.class, getBoundingBox().inflate(12),
                 b -> b != InfectedBiomass.this && b.isAlive() && !b.absorbing() && b.getId() < getId()
-                    && b.mass() + mass() <= EVOLUTION_MASS).stream()
+                    && b.idleTicks >= BiomassMath.IDLE_TICKS && !b.receiving() && b.mass() < EVOLUTION_MASS
+                    && b.mass() + mass() <= BiomassMath.MAX_SIZE_MASS * 2).stream()
                 .min(Comparator.comparingDouble(InfectedBiomass.this::distanceToSqr)).orElse(null);
             return other != null;
         }
-        @Override public boolean canContinueToUse() { return other != null && other.isAlive() && !other.absorbing() && !absorbing() && other.mass() + mass() <= EVOLUTION_MASS; }
+        @Override public boolean canContinueToUse() { return other != null && other.isAlive() && !other.absorbing() && !absorbing() && !receiving()
+            && idleTicks >= BiomassMath.IDLE_TICKS && other.idleTicks >= BiomassMath.IDLE_TICKS
+            && other.mass() + mass() <= BiomassMath.MAX_SIZE_MASS * 2 && distanceToSqr(other) < 256; }
         @Override public void tick() {
             if (distanceToSqr(other) <= 2.25) beginAbsorption(other);
             else if (tickCount % 10 == 0) getNavigation().moveTo(other, 1);

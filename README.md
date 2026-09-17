@@ -5,16 +5,17 @@ It adds a corrupted Overworld-like dimension, per-dimension corruption, and perm
 Spore protection for Overworld mushroom islands. This is an independent addon, not
 an official Spore release.
 
-## Sporebound 0.4.0
+## Sporebound 0.5.0
 
-Version 0.4.0 adds corrupted skies, Remnant Mycelial Crust, all-creature targeting,
-and animated Infected Biomass merging and feeding.
-See [implementation and validation notes](docs/INFECTED_BIOMASS.md).
+Version 0.5.0 replaces vanilla mushrooms in corrupted biomes with Spore colonies,
+uses distinct Spore soil, adds health-scaled biomass and item feeding, enables
+pillager outposts, and lets mature Hive Minds spread underground.
+See [mechanics and limits](docs/RELEASE_0.5.0.md).
 
 ## Installation
 
-Download `sporebound-0.4.0.jar` and its SHA-256 checksum from the
-[0.4.0 release](https://github.com/OuterRingFoundry/SporeAddition/releases/tag/v0.4.0).
+Download `sporebound-0.5.0.jar` and its SHA-256 checksum from the
+[0.5.0 release](https://github.com/OuterRingFoundry/SporeAddition/releases/tag/v0.5.0).
 Replace the older Sporebound JAR on both server and clients; keep only one version.
 
 
@@ -27,7 +28,7 @@ are bundled into this mod.
 Optional compatibility targets: ConcentricWorld 0.31.1 structure-fix build and
 Civillis 2.0.1-release. See `compatibility/` for precise artifact identities.
 
-Versions 0.2 through 0.4 change only newly generated terrain; old chunks retain their previous landscape.
+Versions 0.2 through 0.5 change only newly generated terrain; old chunks retain their previous landscape.
 Upgrading from 0.1 performs a one-time census of stored Hive Mind entities without
 loading their chunks. Existing founders are subject to the new population caps.
 
@@ -130,7 +131,8 @@ no spore haze or exposure.
 Submerged surfaces use sediment (sand, gravel, mud and clay) instead of grass or
 mycelium. Spore ruins require dry, sufficiently even terrain across all their
 pieces, with terrain blending at the foundations. Plains villages can generate in
-Remnant Groves and Blighted Wilds. These generation changes apply to new chunks;
+Remnant Groves and Blighted Wilds. Pillager outposts can generate in those regions
+and Ribbed Highlands, retaining their vanilla inhabitants and spawn rules. These generation changes apply to new chunks;
 existing underwater turf and damaged structures are not automatically rebuilt.
 
 | Index | Behavior |

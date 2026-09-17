@@ -66,6 +66,7 @@ public final class RuntimeValidation {
         waterAndVillages(blight);
         exposure(blight);
         FungalValidation.run(blight, RuntimeValidation::require);
+        HiveBurrowingValidation.run(blight, RuntimeValidation::require);
         int founders=0;
         for(var entity:blight.getAllEntities())if(entity instanceof com.Harbinger.Spore.Sentities.Organoids.Proto)founders++;
         require(founders==1,"exactly one initial Hive Mind: "+founders);
@@ -225,6 +226,32 @@ public final class RuntimeValidation {
         require(village.biomes().stream().anyMatch(b->b.is(Sporebound.id("remnant_grove"))),"villages allowed in remnant groves");
         require(village.biomes().stream().anyMatch(b->b.is(Sporebound.id("blighted_wilds"))),"villages allowed in blighted wilds");
         require(village.biomes().stream().anyMatch(b->b.is(net.minecraft.world.level.biome.Biomes.PLAINS)),"vanilla village biome tags preserved");
+        var outpost=structures.get(ResourceLocation.parse("minecraft:pillager_outpost"));
+        require(outpost.biomes().stream().anyMatch(b->b.is(Sporebound.id("blighted_wilds")))
+            && outpost.biomes().stream().anyMatch(b->b.is(Sporebound.id("ribbed_highlands"))),
+            "pillager outposts allowed in corrupted regions");
+        require(outpost.biomes().stream().anyMatch(b->b.is(net.minecraft.world.level.biome.Biomes.PLAINS)),
+            "vanilla outpost biome tags preserved");
+        for(String name:new String[]{"blighted_wilds","drowned_hollows","ribbed_highlands"}) {
+            var biome=level.registryAccess().registryOrThrow(Registries.BIOME)
+                .getHolderOrThrow(ResourceKey.create(Registries.BIOME,Sporebound.id(name)));
+            var vegetation=biome.value().getGenerationSettings().features().stream().flatMap(h->h.stream())
+                .map(h->h.unwrapKey().orElseThrow().location()).toList();
+            require(vegetation.stream().noneMatch(id->id.getNamespace().equals("minecraft")&&id.getPath().contains("mushroom")),
+                "no vanilla mushroom generation in "+name);
+            require(vegetation.contains(Sporebound.id("spore_colonies"))
+                &&vegetation.contains(ResourceLocation.parse("spore:ground_fungal_foliage")),"native Spore vegetation in "+name);
+        }
+        var generationPos=new BlockPos(224,240,224);level.getChunkAt(generationPos);
+        for(var floor:BlockPos.betweenClosed(generationPos.offset(-3,-1,-3),generationPos.offset(3,-1,3)))
+            level.setBlockAndUpdate(floor,com.Harbinger.Spore.core.Sblocks.INFESTED_DIRT.get().defaultBlockState());
+        require(Sporebound.COLONIES.get().place(new net.minecraft.world.level.levelgen.feature.FeaturePlaceContext<>(
+            java.util.Optional.empty(),level,generator,net.minecraft.util.RandomSource.create(913),generationPos,
+            net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration.INSTANCE)),
+            "Spore colonies grow on infested soil");
+        require(BlockPos.betweenClosedStream(generationPos.offset(-3,0,-3),generationPos.offset(3,8,3))
+            .anyMatch(p->level.getBlockState(p).is(com.Harbinger.Spore.core.Sblocks.FUNGAL_STEM_TOP.get())),
+            "generated colonies contain mature Spore stalks");
     }
     private static void terrainAndCairn(ServerLevel blight,ServerLevel overworld) {
         var generator=blight.getChunkSource().getGenerator();

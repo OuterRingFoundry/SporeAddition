@@ -66,6 +66,42 @@ public final class FungalValidation {
             && level.getBlockState(cropPos.below()).is(Blocks.DIRT),"mature crop feeds infection and ruins farmland");
         level.getGameRules().getRule(net.minecraft.world.level.GameRules.RULE_MOBGRIEFING).set(grief,level.getServer());
         attacker.discard(); cow.discard();
+        var scavenger = create(level,pos);
+        float smallWidth = scavenger.getBbWidth(), smallHealth = scavenger.getMaxHealth();
+        var sporeFood = new net.minecraft.world.entity.item.ItemEntity(level,scavenger.getX(),scavenger.getY(),scavenger.getZ(),
+            new net.minecraft.world.item.ItemStack(com.Harbinger.Spore.core.Sblocks.ROOTED_BIOMASS.get(),3));
+        sporeFood.setPickUpDelay(40); level.addFreshEntity(sporeFood);
+        check.accept(!scavenger.digest(sporeFood),"biomass respects item pickup delay");
+        sporeFood.setNoPickUpDelay();
+        check.accept(scavenger.digest(sporeFood) && scavenger.mass()==2 && sporeFood.getItem().getCount()==2,
+            "biomass eats Spore items one at a time and grows");
+        check.accept(scavenger.getBbWidth()>smallWidth && scavenger.getMaxHealth()>smallHealth,
+            "growth increases collision size and maximum health");
+        valuable.moveTo(scavenger.position()); valuable.setNoPickUpDelay();
+        check.accept(scavenger.digest(valuable) && valuable.isRemoved(),"biomass digests non-food loot");
+        level.getGameRules().getRule(net.minecraft.world.level.GameRules.RULE_MOBGRIEFING).set(false,level.getServer());
+        check.accept(!scavenger.digest(sporeFood),"mobGriefing=false prevents biomass item consumption");
+        level.getGameRules().getRule(net.minecraft.world.level.GameRules.RULE_MOBGRIEFING).set(grief,level.getServer());
+        check.accept(scavenger.idleTicks()==0,"feeding resets the idle merge timer");
+        for(int i=0;i<BiomassMath.IDLE_TICKS;i++) scavenger.tick();
+        check.accept(scavenger.idleTicks()==BiomassMath.IDLE_TICKS,"idle biomass becomes ready to coalesce after thirty seconds");
+        sporeFood.moveTo(scavenger.getX()+5,scavenger.getY(),scavenger.getZ());
+        scavenger.tickCount=20;
+        for(int i=0;i<6;i++)scavenger.goalSelector.tick();
+        check.accept(scavenger.goalSelector.getAvailableGoals().stream()
+            .anyMatch(g -> g.isRunning() && g.getGoal().getClass().getSimpleName().equals("ItemForagingGoal"))
+            && !scavenger.getNavigation().isDone(),"biomass actively paths toward distant dropped Spore items");
+        scavenger.discard(); sporeFood.discard();
+        var idleReceiver=create(level,pos);var idleDonor=create(level,pos.offset(1,0,0));
+        var coalesce=idleDonor.goalSelector.getAvailableGoals().stream()
+            .map(net.minecraft.world.entity.ai.goal.WrappedGoal::getGoal)
+            .filter(g -> g.getClass().getSimpleName().equals("CoalesceGoal")).findFirst().orElseThrow();
+        check.accept(!coalesce.canUse(),"fresh biomass does not immediately cannibalize neighbors");
+        for(int i=0;i<BiomassMath.IDLE_TICKS;i++){idleReceiver.tick();idleDonor.tick();}
+        check.accept(coalesce.canUse(),"idle merge AI acquires a nearby biomass recipient");
+        coalesce.tick();
+        check.accept(idleDonor.absorbing(),"idle merge AI starts assimilation without external intervention");
+        idleReceiver.discard();idleDonor.discard();
         var receiver=create(level,pos); receiver.setMass(3);
         var donor=create(level,pos.offset(1,0,0)); donor.setMass(2);
         check.accept(donor.beginAbsorption(receiver),"biomass starts merging");
@@ -79,8 +115,8 @@ public final class FungalValidation {
         check.accept(interrupted.beginAbsorption(receiver),"second merge begins");
         receiver.moveTo(pos.getX()+10,pos.getY(),pos.getZ());interrupted.tick();
         check.accept(!interrupted.absorbing() && interrupted.mass()==1 && receiver.mass()==5,"out-of-range merge cancels without mass loss");
-        receiver.moveTo(pos.getX(),pos.getY(),pos.getZ());receiver.setMass(8);
-        check.accept(receiver.evolve(level) && receiver.isRemoved(),"eight biomass units evolve into a powerful Spore mob");
+        receiver.moveTo(pos.getX(),pos.getY(),pos.getZ());receiver.setMass(9);
+        check.accept(receiver.evolve(level) && receiver.isRemoved(),"overflow biomass units evolve into a powerful Spore mob");
         interrupted.discard();
         var fox=EntityType.FOX.create(level);fox.moveTo(pos.getX()+5,pos.getY(),pos.getZ());level.addFreshEntity(fox);
         fox.addEffect(new MobEffectInstance(Seffects.MYCELIUM,200));
@@ -88,6 +124,32 @@ public final class FungalValidation {
         var death=new LivingDeathEvent(fox,fox.damageSources().generic());
         check.accept(FungalEcology.convertUnmatched(death),"unmatched infected creature becomes biomass");
         check.accept(!FungalEcology.convertUnmatched(death),"conversion is idempotent for the same corpse");
+        var powerful=EntityType.FOX.create(level);powerful.moveTo(pos.getX()+5,pos.getY(),pos.getZ());
+        powerful.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH).setBaseValue(500);
+        powerful.setCustomName(net.minecraft.network.chat.Component.literal("500-health fixture"));
+        level.addFreshEntity(powerful);powerful.addEffect(new MobEffectInstance(Seffects.MYCELIUM,200));
+        check.accept(FungalEcology.convertUnmatched(new LivingDeathEvent(powerful,powerful.damageSources().generic())),
+            "500-health creature converts successfully");
+        var lumps=level.getEntitiesOfClass(InfectedBiomass.class,new net.minecraft.world.phys.AABB(pos).inflate(16),
+            b -> b.hasCustomName() && b.getCustomName().getString().equals("500-health fixture"));
+        check.accept(lumps.size()==4 && lumps.stream().mapToInt(InfectedBiomass::mass).sum()==25
+            && lumps.stream().allMatch(b -> b.mass()<=BiomassMath.MAX_SIZE_MASS),
+            "500 health produces four bounded lumps totaling 25 mass");
+        lumps.forEach(net.minecraft.world.entity.Entity::discard);
+        var full=create(level,pos);full.setMass(8);
+        check.accept(!full.evolve(level),"a full corpse lump stays biomass until additional feeding or merging");
+        var extra=create(level,pos.offset(1,0,0));extra.setMass(8);
+        check.accept(extra.beginAbsorption(full),"two full lumps can merge beyond the size limit");
+        for(int i=0;i<InfectedBiomass.ABSORB_TICKS;i++)extra.tick();
+        check.accept(extra.isRemoved() && full.mass()==16 && full.massScale()==2,
+            "overflow merging conserves mass while bounding physical size");
+        var blocked=net.minecraft.core.BlockPos.containing(full.position());
+        for(var block:BlockPos.betweenClosed(blocked.offset(-3,0,-3),blocked.offset(3,4,3)))
+            level.setBlockAndUpdate(block,Blocks.STONE.defaultBlockState());
+        check.accept(!full.evolve(level) && full.mass()==16 && full.isAlive(),"blocked evolution retains all mass");
+        for(var block:BlockPos.betweenClosed(blocked.offset(-3,0,-3),blocked.offset(3,4,3)))
+            level.setBlockAndUpdate(block,Blocks.AIR.defaultBlockState());
+        check.accept(full.evolve(level),"overflow retries evolution once there is room");
         var zombie=EntityType.ZOMBIE.create(level);
         check.accept(FungalEcology.hasConversion(zombie),"native zombie fungal conversion is retained");
         var canceled=EntityType.FOX.create(level);canceled.moveTo(pos.getX(),pos.getY(),pos.getZ());

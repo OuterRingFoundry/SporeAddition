@@ -57,6 +57,7 @@ public final class FungalClientValidation {
             check.accept(mc.getResourceManager().getResource(Sporebound.id("textures/entity/infected_biomass.png")).isPresent(),"biomass skin is present in client resources");
             check.accept(mc.getResourceManager().getResource(Sporebound.id("textures/block/remnant_mycelium.png")).isPresent(),"remnant crust skin is present in client resources");
             check.accept(r.mass()==3,"biomass mass reaches the client");
+            check.accept(r.getBbWidth()>d.getBbWidth(),"mass-dependent collision size reaches the client");
             validateSky(check);screenshot.accept("08-fungal-remnants.png");
             phase=1;
             mc.getSingleplayerServer().execute(()->{

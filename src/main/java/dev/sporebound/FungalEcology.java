@@ -79,13 +79,21 @@ public final class FungalEcology {
                 || Protection.sterile(level, victim.blockPosition()) || hasConversion(victim)
                 || (!victim.hasEffect(Seffects.MYCELIUM)
                     && (event.getSource().getEntity() == null || !Protection.spore(event.getSource().getEntity())))) return false;
-        InfectedBiomass biomass = FungalContent.BIOMASS.get().create(level);
-        if (biomass == null) return false;
-        biomass.moveTo(victim.getX(), victim.getY(), victim.getZ(), victim.getYRot(), 0);
-        biomass.setCustomName(victim.getCustomName());
-        biomass.setPersistenceRequired();
-        biomass.setOrigin(BuiltInRegistries.ENTITY_TYPE.getKey(victim.getType()).toString());
-        if (!level.addFreshEntity(biomass)) return false;
+        int remaining = BiomassMath.fromHealth(victim.getMaxHealth());
+        var created = new java.util.ArrayList<InfectedBiomass>();
+        // Stage every lump before removing the victim. A rejected spawn rolls back the conversion.
+        while (remaining > 0) {
+            InfectedBiomass biomass = FungalContent.BIOMASS.get().create(level);
+            if (biomass == null) { created.forEach(Entity::discard); return false; }
+            biomass.setMass(Math.min(remaining, BiomassMath.MAX_SIZE_MASS));
+            biomass.moveTo(victim.getX(), victim.getY(), victim.getZ(), victim.getYRot(), 0);
+            biomass.setCustomName(victim.getCustomName());
+            biomass.setPersistenceRequired();
+            biomass.setOrigin(BuiltInRegistries.ENTITY_TYPE.getKey(victim.getType()).toString());
+            if (!level.addFreshEntity(biomass)) { created.forEach(Entity::discard); return false; }
+            created.add(biomass);
+            remaining -= biomass.mass();
+        }
         victim.discard();
         return true;
     }
