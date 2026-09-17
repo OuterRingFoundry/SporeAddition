@@ -22,6 +22,7 @@ import net.neoforged.neoforge.client.event.ClientTickEvent;
 @EventBusSubscriber(modid=Sporebound.ID,value=Dist.CLIENT)
 public final class ClientValidation {
     private static int ticks,checks;
+    private static boolean finished;
     private static long waitingSince;
     private static volatile BlockPos departure,arrival;
     private static volatile boolean setupComplete,serverTravelReady;
@@ -35,7 +36,7 @@ public final class ClientValidation {
         ++serverTicks;
     }
     @SubscribeEvent public static void tick(ClientTickEvent.Post event) {
-        if(!Boolean.getBoolean("sporebound.clientValidation"))return;
+        if(!Boolean.getBoolean("sporebound.clientValidation") || finished)return;
         var mc=Minecraft.getInstance();
         if(mc.level==null && mc.screen!=null) {
             for(var child:mc.screen.children())if(child instanceof net.minecraft.client.gui.components.Button button
@@ -183,6 +184,10 @@ public final class ClientValidation {
         if(ticks==920)FungalClientValidation.setup();
         if(ticks>920 && FungalClientValidation.tick(ClientValidation::check,ClientValidation::shot)){
             try{Files.writeString(mc.gameDirectory.toPath().resolve("client-validation.json"),"{\"status\":\"passed\",\"checks\":"+checks+",\"screenshots\":10}\n");}catch(Exception error){throw new RuntimeException(error);}
+            // Leave through the normal disconnect path while client tasks can still run.
+            // Stopping the render loop first can strand integrated-server save work.
+            finished=true;
+            mc.disconnect();
             System.out.println("SPOREBOUND CLIENT ACCEPTANCE PASS");mc.stop();
         }
     }
