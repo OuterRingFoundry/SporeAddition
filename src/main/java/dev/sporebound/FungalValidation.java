@@ -159,11 +159,13 @@ public final class FungalValidation {
         for(var mob:level.getEntitiesOfClass(Mob.class,new net.minecraft.world.phys.AABB(pos).inflate(16)))mob.discard();
     }
     public static void prepareRestart(ServerLevel level) {
-        var persisted=create(level,new BlockPos(176,240,176));persisted.setMass(5);persisted.setHunger(100);persisted.setOrigin("sporebound:restart_fixture");persisted.setPersistenceRequired();
+        var persisted=create(level,new BlockPos(176,240,176));persisted.setNoGravity(true);persisted.setMass(5);persisted.setHunger(100);persisted.setOrigin("sporebound:restart_fixture");persisted.setPersistenceRequired();
     }
     public static void afterRestart(ServerLevel level, BiConsumer<Boolean,String> check) {
         var found=level.getEntitiesOfClass(InfectedBiomass.class,new net.minecraft.world.phys.AABB(new BlockPos(176,240,176)).inflate(8),
             b -> b.origin().equals("sporebound:restart_fixture"));
+        if(found.isEmpty())for(var entity:level.getAllEntities())if(entity instanceof InfectedBiomass biomass)
+            System.out.println("SPOREBOUND RESTART BIOMASS: "+biomass.origin()+" at "+biomass.position());
         check.accept(found.size()==1 && found.getFirst().mass()==5 && found.getFirst().hunger()==100 && !found.getFirst().absorbing(),
             "biomass mass, hunger and origin survive a full server restart; found=" + found.stream()
                 .map(b -> b.mass() + ":" + b.origin() + ":" + b.position()).toList());
