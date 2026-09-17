@@ -52,9 +52,10 @@ public final class Hivebound {
         if(!(player.level() instanceof ServerLevel level))return;
         boolean member=member(player);
         double index=Protection.sterile(level,player.blockPosition())?0:RegionalCorruption.at(level,player.blockPosition());
-        double health=member?(index>0?index*0.10:-0.20):0;
-        double damage=member?(index>0?index*0.075:-0.25):0;
-        double speed=member?(index>0?index*0.015:-0.15):0;
+        double evolution=EvolutionMath.bonus(HiveboundEvolution.points(player));
+        double health=member?(index>0?index*0.10+evolution*0.05:-0.20):0;
+        double damage=member?(index>0?index*0.075+evolution*0.025:-0.25):0;
+        double speed=member?(index>0?index*0.015+HiveboundEvolution.stage(player)*0.025:-0.15):0;
         float oldMaximum=player.getMaxHealth(),fraction=player.getHealth()/oldMaximum;
         String owned="sporebound:armor_symbiosis";
         if(!member||index<=0){
@@ -83,7 +84,10 @@ public final class Hivebound {
     }
     @SubscribeEvent public void tick(EntityTickEvent.Pre event){
         if(event.getEntity().level().isClientSide)return;
-        if(event.getEntity() instanceof Player player)update(player);
+        if(event.getEntity() instanceof Player player){
+            update(player);
+            if(player.tickCount%20==0){HiveboundEvolution.hungerSecond(player);HiveboundEvolution.feedStructure(player);}
+        }
         if(event.getEntity() instanceof Mob mob&&Protection.spore(mob)&&member(mob.getTarget()))mob.setTarget(null);
     }
     @SubscribeEvent public void damage(LivingIncomingDamageEvent event){

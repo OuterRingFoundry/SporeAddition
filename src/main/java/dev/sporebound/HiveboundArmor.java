@@ -27,6 +27,7 @@ public final class HiveboundArmor extends SporeBaseArmor implements CustomModelA
     @Override public void appendHoverText(ItemStack stack,Item.TooltipContext context,List<Component> text,TooltipFlag flag){
         text.add(Component.translatable("item.sporebound.hivebound.binding").withStyle(net.minecraft.ChatFormatting.RED));
         text.add(Component.translatable("item.sporebound.hivebound.symbiosis").withStyle(net.minecraft.ChatFormatting.DARK_GREEN));
+        text.add(Component.translatable("item.sporebound.hivebound.evolution").withStyle(net.minecraft.ChatFormatting.DARK_PURPLE));
         super.appendHoverText(stack,context,text,flag);
     }
 }

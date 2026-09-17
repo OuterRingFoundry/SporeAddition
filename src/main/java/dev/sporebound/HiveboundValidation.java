@@ -91,6 +91,7 @@ public final class HiveboundValidation {
         var recovered=player.getItemBySlot(EquipmentSlot.HEAD);Hivebound.restore(player,saved);
         check.accept(recovered==player.getItemBySlot(EquipmentSlot.HEAD),"death recovery consumes its saved payload exactly once");
         player.getPersistentData().remove("sporebound:bound_armor");
+        HiveboundEvolutionValidation.run(level,player,check);
         player.getInventory().clearContent();Hivebound.update(player);
         check.accept(!Hivebound.member(player)&&player.getMaxHealth()==20,"removing the set clears membership and scaling");
         CorruptionData.get(level).set(before);

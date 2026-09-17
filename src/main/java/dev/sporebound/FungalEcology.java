@@ -51,6 +51,8 @@ public final class FungalEcology {
         if (mob instanceof Infected infected
                 && mob.goalSelector.getAvailableGoals().stream().noneMatch(g -> g.getGoal() instanceof BiomassFeedingGoal))
             mob.goalSelector.addGoal(2, new BiomassFeedingGoal(infected));
+        if(mob instanceof Infected infected && mob.goalSelector.getAvailableGoals().stream().noneMatch(g->g.getGoal() instanceof HiveboundFollowGoal))
+            mob.goalSelector.addGoal(4,new HiveboundFollowGoal(infected));
         if(mob instanceof Infected infected && BiomassAssimilationGoal.basic(infected)
                 && mob.goalSelector.getAvailableGoals().stream().noneMatch(g->g.getGoal() instanceof BiomassAssimilationGoal))
             mob.goalSelector.addGoal(3,new BiomassAssimilationGoal(infected));

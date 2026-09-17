@@ -189,7 +189,7 @@ public final class ClientValidation {
             if(completionTick<0)completionTick=serverTicks;
             // Let tracking, screenshots and generation settle before exercising save-and-quit.
             if(serverTicks-completionTick<100)return;
-            try{Files.writeString(mc.gameDirectory.toPath().resolve("client-validation.json"),"{\"status\":\"passed\",\"checks\":"+checks+",\"screenshots\":12}\n");}catch(Exception error){throw new RuntimeException(error);}
+            try{Files.writeString(mc.gameDirectory.toPath().resolve("client-validation.json"),"{\"status\":\"passed\",\"checks\":"+checks+",\"screenshots\":13}\n");}catch(Exception error){throw new RuntimeException(error);}
             // Leave through the normal disconnect path while client tasks can still run.
             // Stopping the render loop first can strand integrated-server save work.
             finished=true;

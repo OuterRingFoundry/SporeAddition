@@ -107,6 +107,7 @@ public final class WorldRules {
         event.getAffectedEntities().removeIf(entity -> Protection.sterile(level, entity.blockPosition()));
     }
     public static void sync(ServerPlayer player) {
+        EvolutionPayload.sync(player);
         PacketDistributor.sendToPlayer(player, new CorruptionPayload(player.level().dimension().location(),
             CorruptionData.get(player.serverLevel()).index(), Protection.mushroom(player.level(), player.blockPosition()),
             RegionalCorruption.at(player.serverLevel(),player.blockPosition()),RegionalCorruption.name(player.serverLevel(),player.blockPosition())));

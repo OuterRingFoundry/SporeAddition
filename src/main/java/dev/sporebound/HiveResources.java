@@ -46,6 +46,10 @@ public final class HiveResources {
     public static int gather(Proto hive) {
         if(!(hive.level() instanceof ServerLevel level)||!hive.isAlive()||hive.getTarget()!=null
             ||Protection.sterile(level,hive.blockPosition())||hive.getBiomass()>=RESERVE)return 0;
+        for(var player:level.players()){
+            int collected=HiveboundEvolution.feedHive(player,hive,RESERVE-hive.getBiomass());
+            if(collected>0)return collected;
+        }
         var hosts=level.getEntitiesOfClass(Infected.class,hive.getBoundingBox().inflate(32),
             host->host.isAlive()&&host.getTarget()==null&&!Protection.sterile(level,host.blockPosition()));
         var candidate=hosts.stream().filter(host->host.getKills()>0||hosts.size()>=6)
