@@ -20,3 +20,5 @@ for phase in ['write','read']:
     if result.returncode or 'SPOREBOUND ACCEPTANCE PASS: '+mode not in text or 'SPOREBOUND ACCEPTANCE FAILED' in text:
         print(text[-14000:]);raise SystemExit('Acceptance failed: '+mode)
     print(next(line for line in text.splitlines() if 'SPOREBOUND ACCEPTANCE PASS' in line),flush=True)
+
+    if phase=='write':subprocess.run([sys.executable,str(root/'scripts/entity-fixture-audit.py'),str(run/'world')],check=True)

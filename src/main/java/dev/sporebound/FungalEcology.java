@@ -74,7 +74,7 @@ public final class FungalEcology {
                 && !prey(event.getNewAboutToBeSetTarget())) event.setCanceled(true);
     }
     public static boolean hasConversion(LivingEntity victim) {
-        if (victim instanceof Player || victim instanceof net.minecraft.world.entity.animal.IronGolem) return true;
+        if (victim instanceof Survivor || victim instanceof Player || victim instanceof net.minecraft.world.entity.animal.IronGolem) return true;
         if (SporeMobConversionData.getResult(victim.getType()) != null) return true;
         String id = BuiltInRegistries.ENTITY_TYPE.getKey(victim.getType()).toString();
         for (String entry : SConfig.SERVER.inf_human_conv.get()) {

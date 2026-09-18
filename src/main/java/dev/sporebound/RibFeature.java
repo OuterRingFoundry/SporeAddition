@@ -28,7 +28,7 @@ public final class RibFeature extends Feature<NoneFeatureConfiguration> {
             }
         }
         for(var pos:positions)level.setBlock(pos,(pos.getY()<origin.getY()+2?Blocks.POLISHED_BASALT:
-            pos.getY()==origin.getY()+height?Blocks.SHROOMLIGHT:FungalContent.CRUST.get()).defaultBlockState(),2);
+            pos.getY()==origin.getY()+height?Blocks.SHROOMLIGHT:FungalContent.PALE.get()).defaultBlockState(),2);
         return true;
     }
 }

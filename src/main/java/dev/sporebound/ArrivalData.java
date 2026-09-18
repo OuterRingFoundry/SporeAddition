@@ -26,7 +26,10 @@ public final class ArrivalData extends SavedData {
             if(y>level.getMaxBuildHeight()-5)throw new IllegalStateException("No space for the arrival cairn");
             center=new BlockPos(0,y,0);RiftCairn.build(level,center);setDirty();
         }
-        level.getChunkAt(center);return center;
+        level.getChunkAt(center);
+        // Includes intact arrival cairns from older saves; damaged or obstructed sites are left alone.
+        if(!RiftCairn.active(level,center))RiftCairn.melt(level,center);
+        return center;
     }
     @Override public CompoundTag save(CompoundTag tag,HolderLookup.Provider registries) {
         if(center!=null)tag.putLong("center",center.asLong());return tag;

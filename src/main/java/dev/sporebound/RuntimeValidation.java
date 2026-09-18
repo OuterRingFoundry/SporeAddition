@@ -36,12 +36,19 @@ public final class RuntimeValidation {
         require(blight!=null,"dimension exists");
         blight.setChunkForced(176>>4,176>>4,true);
         blight.getChunk(176>>4,176>>4);
+        // Reassert a runtime ticket even when the saved forced-chunk entry already exists.
+        var fixtureChunk=new net.minecraft.world.level.ChunkPos(176>>4,176>>4);
+        blight.getChunkSource().addRegionTicket(net.minecraft.server.level.TicketType.FORCED,fixtureChunk,2,fixtureChunk);
         for(var site:FoundingHives.SITES)blight.getChunk(site[0]>>4,site[1]>>4);
     }
     public static void tick(ServerTickEvent.Post event) {
         if(mode==null||ran||++ticks<80)return;
+        var fixture=event.getServer().getLevel(Sporebound.BLIGHT);
+        boolean entitiesReady=fixture.areEntitiesLoaded(net.minecraft.world.level.ChunkPos.asLong(176>>4,176>>4));
+        if(!entitiesReady&&ticks<600)return;
         ran=true;
         try {
+            require(entitiesReady,"fixture entity chunk completes asynchronous loading before validation");
             if(mode.endsWith("read"))read(event.getServer());else write(event.getServer());
             System.out.println("SPOREBOUND ACCEPTANCE PASS: "+mode+" checks="+checks);
             event.getServer().halt(false);
@@ -70,6 +77,8 @@ public final class RuntimeValidation {
         HiveBurrowingValidation.run(blight, RuntimeValidation::require);
         HiveboundValidation.run(blight, RuntimeValidation::require);
         CollectiveValidation.run(blight, RuntimeValidation::require);
+        FrontierValidation.run(blight, RuntimeValidation::require);
+        SurvivorCombatValidation.run(blight, RuntimeValidation::require);
         int founders=0;
         for(var entity:blight.getAllEntities())if(entity instanceof com.Harbinger.Spore.Sentities.Organoids.Proto)founders++;
         require(founders==1,"exactly one initial Hive Mind: "+founders);
@@ -300,8 +309,14 @@ public final class RuntimeValidation {
         overworld.setBlock(center.above(3),Blocks.AIR.defaultBlockState(),3);
         overworld.setBlock(center.east(),Blocks.OBSIDIAN.defaultBlockState(),3);
         require(!RiftCairn.complete(overworld,center),"ordinary obsidian cannot substitute crying obsidian");
+        require(!RiftCairn.melt(overworld,center),"damaged cairn cannot melt or repair itself");
+        overworld.setBlock(center.east(),Blocks.CRYING_OBSIDIAN.defaultBlockState(),3);
+        require(RiftCairn.melt(overworld,center)&&RiftCairn.active(overworld,center),"intact cairn becomes a complete fused rift");
+        overworld.setBlock(center.above(),Blocks.STONE.defaultBlockState(),3);
+        require(!RiftCairn.active(overworld,center),"melted rifts still require unobstructed headroom");
+        overworld.setBlock(center.above(),Blocks.AIR.defaultBlockState(),3);
         var arrival=ArrivalData.get(blight).center(blight);
-        require(RiftCairn.complete(blight,arrival),"arrival cairn complete above real generated terrain");
+        require(RiftCairn.active(blight,arrival),"arrival cairn generates already melted and activated above terrain");
         require(ArrivalData.get(blight).center(blight).equals(arrival),"arrival anchor remains fixed on repeated visits");
         var ribOrigin=new BlockPos(32,260,32);blight.getChunkAt(ribOrigin);
         for(int x=-4;x<=4;x++)for(int z=-4;z<=4;z++)blight.setBlock(ribOrigin.offset(x,-1,z),Blocks.STONE.defaultBlockState(),3);
@@ -309,7 +324,7 @@ public final class RuntimeValidation {
             blight,generator,net.minecraft.util.RandomSource.create(913),ribOrigin),"calcified rib feature places in corrupted world");
         int calcite=0,light=0;
         for(var block:BlockPos.betweenClosed(ribOrigin.offset(-4,0,-4),ribOrigin.offset(4,14,4))) {
-            if(blight.getBlockState(block).is(FungalContent.CRUST.get()))calcite++;
+            if(blight.getBlockState(block).is(FungalContent.PALE.get()))calcite++;
             if(blight.getBlockState(block).is(Blocks.SHROOMLIGHT))light++;
         }
         require(calcite>15&&light>0&&blight.getBlockState(ribOrigin.above(2)).isAir(),"mycelial ribs form an open arch with luminous tips");
@@ -328,7 +343,9 @@ public final class RuntimeValidation {
         require(CorruptionData.get(blight).index()==4.25,"custom index survives restart");
         require(!SurvivorColonies.get(blight).homes().isEmpty(),"survivor colony ledger survives process restart");
         for(int i=0;i<FoundingHives.SITES.length;i++)require(CorruptionData.get(blight).seeded(i),"founder marker survives restart "+i);
-        require(RiftCairn.complete(blight,ArrivalData.get(blight).center(blight)),"arrival cairn and coordinate survive restart");
+        require(RiftCairn.active(blight,ArrivalData.get(blight).center(blight)),"melted arrival cairn and coordinate survive restart");
+        var savedRift=new BlockPos(96,250,96);server.overworld().getChunkAt(savedRift);
+        require(RiftCairn.active(server.overworld(),savedRift),"shared melted departure activation survives a full restart");
         set(blight,6);FoundingHives.seed(blight);
         int count=0;for(var entity:blight.getAllEntities())if(entity instanceof com.Harbinger.Spore.Sentities.Organoids.Proto)count++;
         require(count==0,"defeated founding hives never respawn after restart");

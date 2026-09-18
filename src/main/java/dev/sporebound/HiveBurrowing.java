@@ -78,7 +78,7 @@ public final class HiveBurrowing {
             || state.is(Blocks.ANDESITE) || state.is(Sblocks.INFESTED_DIRT.get())
             || state.is(Sblocks.INFESTED_STONE.get()) || state.is(Sblocks.INFESTED_DEEPSLATE.get())
             || state.is(Sblocks.BIOMASS_BLOCK.get()) || state.is(Sblocks.ROOTED_MYCELIUM.get())
-            || state.is(FungalContent.CRUST.get());
+            || (state.is(FungalContent.CRUST.get()) || state.is(FungalContent.PALE.get()));
     }
     private static boolean place(ServerLevel level, Proto hive, BlockPos pos) {
         if (hive.getBiomass() < BIOMASS_THRESHOLD || !level.hasChunkAt(pos) || level.isOutsideBuildHeight(pos)

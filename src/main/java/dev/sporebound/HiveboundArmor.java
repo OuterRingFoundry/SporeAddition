@@ -19,7 +19,7 @@ public final class HiveboundArmor extends SporeBaseArmor implements CustomModelA
             SConfig.SERVER.armor_toughness2.get()*1.25f,SConfig.SERVER.knockback_resistance2.get());
     }
     private static int[] boost(int[] values){for(int i=0;i<values.length;i++)values[i]=(int)Math.ceil(values[i]*1.25);return values;}
-    @Override public ResourceLocation getTextureLocation(){return ResourceLocation.parse("spore:textures/armor/flesh_armor_set.png");}
+    @Override public ResourceLocation getTextureLocation(){return Sporebound.id("textures/armor/hivebound.png");}
     @Override public boolean isFoil(ItemStack stack){return true;}
     @Override public <T extends LivingEntity> int damageItem(ItemStack stack,int amount,T entity,java.util.function.Consumer<Item> broken){
         return Math.min(super.damageItem(stack,amount,entity,broken),Math.max(0,stack.getMaxDamage()-stack.getDamageValue()-10));

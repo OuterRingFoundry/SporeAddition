@@ -14,16 +14,28 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 
-/** An inert vanilla-block ritual; never opens an entity portal or changes corruption. */
+/** A first crossing fuses the ritual into a persistent, shared rift. Travel remains explicit. */
 public final class RiftCairn {
     private RiftCairn() {}
     public static boolean complete(Level level, BlockPos center) {
+        boolean melted=level.getBlockState(center).is(FungalContent.RIFT_CORE.get());
         for(int x=-1;x<=1;x++)for(int z=-1;z<=1;z++) {
-            var expected=x==0&&z==0?Blocks.AMETHYST_BLOCK:
+            var expected=melted ? (x==0&&z==0?FungalContent.RIFT_CORE.get():FungalContent.RIFT_SLAG.get())
+                : x==0&&z==0?Blocks.AMETHYST_BLOCK:
                 x==0||z==0?Blocks.CRYING_OBSIDIAN:Blocks.POLISHED_DEEPSLATE;
             if(!level.getBlockState(center.offset(x,0,z)).is(expected))return false;
             for(int y=1;y<=3;y++)if(!level.getBlockState(center.offset(x,y,z)).isAir())return false;
         }
+        return true;
+    }
+    public static boolean active(Level level, BlockPos center) {
+        return level.getBlockState(center).is(FungalContent.RIFT_CORE.get()) && complete(level,center);
+    }
+    /** Only transforms an intact ritual; never repairs or overwrites a damaged player's structure. */
+    public static boolean melt(ServerLevel level, BlockPos center) {
+        if(!complete(level,center))return false;
+        for(int x=-1;x<=1;x++)for(int z=-1;z<=1;z++)
+            level.setBlock(center.offset(x,0,z),(x==0&&z==0?FungalContent.RIFT_CORE.get():FungalContent.RIFT_SLAG.get()).defaultBlockState(),3);
         return true;
     }
     public static void build(ServerLevel level, BlockPos center) {
@@ -37,15 +49,21 @@ public final class RiftCairn {
     }
     public static boolean enter(ServerPlayer player, BlockPos center) {
         var level=player.serverLevel();
+        if(player.isSpectator()||!player.isAlive()
+            ||(!player.getMainHandItem().is(Sporebound.TALISMAN.get())&&!player.getOffhandItem().is(Sporebound.TALISMAN.get())))return fail(player,"talisman");
         if(player.getCooldowns().isOnCooldown(Sporebound.TALISMAN.get()))return false;
         if(Protection.mushroom(level,center))return fail(player,"sanctuary");
         if(!complete(level,center))return fail(player,"incomplete");
+        boolean activated=active(level,center);
         int pearl=-1;
         for(int i=0;i<player.getInventory().getContainerSize();i++)
             if(player.getInventory().getItem(i).is(Items.ENDER_PEARL)){pearl=i;break;}
-        if(pearl<0&&!player.getAbilities().instabuild)return fail(player,"pearl");
+        if(!activated&&pearl<0&&!player.getAbilities().instabuild)return fail(player,"pearl");
         if(!Travel.enter(player))return false;
-        if(!player.getAbilities().instabuild)player.getInventory().removeItem(pearl,1);
+        if(!activated) {
+            if(!player.getAbilities().instabuild)player.getInventory().removeItem(pearl,1);
+            melt(level,center);
+        }
         effect(level,center);
         player.getCooldowns().addCooldown(Sporebound.TALISMAN.get(),100);
         player.displayClientMessage(Component.translatable("message.sporebound.arrived"),true);

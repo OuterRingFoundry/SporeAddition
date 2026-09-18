@@ -17,7 +17,7 @@ public final class SporeColonyFeature extends Feature<NoneFeatureConfiguration> 
         for (int stem = 0; stem < 5; stem++) {
             BlockPos base = context.origin().offset(context.random().nextInt(5) - 2, 0, context.random().nextInt(5) - 2);
             var floor = level.getBlockState(base.below());
-            if (!(floor.is(BlockTags.DIRT) || floor.is(Sblocks.INFESTED_DIRT.get()) || floor.is(FungalContent.CRUST.get()))) continue;
+            if (!(floor.is(BlockTags.DIRT) || floor.is(Sblocks.INFESTED_DIRT.get()) || (floor.is(FungalContent.CRUST.get()) || floor.is(FungalContent.PALE.get())))) continue;
             int height = 3 + context.random().nextInt(5);
             boolean clear = true;
             for (int y = 0; y <= height; y++) if (!level.getBlockState(base.above(y)).isAir()) { clear = false; break; }

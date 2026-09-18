@@ -70,6 +70,8 @@ public final class CollectiveValidation {
         check.accept(colonies.found(level,base),"three survivors naturally establish a colony on eligible terrain");
         var residents=level.getEntitiesOfClass(Survivor.class,new net.minecraft.world.phys.AABB(base).inflate(8));
         check.accept(residents.size()==3&&residents.stream().allMatch(s->s.home().equals(base)),"colony members retain a common home");
+        check.accept(residents.stream().filter(Survivor::archer).count()==1
+            &&residents.stream().filter(s->s.getOffhandItem().is(Items.SHIELD)).count()==2,"new colony reliably spawns one archer and two shield defenders");
         var worker=residents.getFirst();worker.moveTo(base.getX(),base.getY(),base.getZ());
         var item=new net.minecraft.world.entity.item.ItemEntity(level,worker.getX()+0.5,worker.getY(),worker.getZ(),new ItemStack(Items.IRON_INGOT,3));level.addFreshEntity(item);
         check.accept(worker.collect(item)&&item.isRemoved()&&worker.supplies().countItem(Items.IRON_INGOT)==3,"survivor collects dropped resources without duplication");
@@ -102,13 +104,19 @@ public final class CollectiveValidation {
         var player=net.neoforged.neoforge.common.util.FakePlayerFactory.get(level,
             new com.mojang.authlib.GameProfile(UUID.fromString("30000000-0000-0000-0000-000000000017"),"awakening-test"));
         player.moveTo(base.getX()+0.5,base.getY(),base.getZ()+0.5);player.setGameMode(GameType.SURVIVAL);
-        player.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND,new ItemStack(Sporebound.TALISMAN.get()));
-        player.setItemInHand(net.minecraft.world.InteractionHand.OFF_HAND,new ItemStack(Items.NETHER_STAR,2));
+        player.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND,new ItemStack(Sporebound.CATALYST.get(),2));
+        player.setItemInHand(net.minecraft.world.InteractionHand.OFF_HAND,ItemStack.EMPTY);
         player.setShiftKeyDown(true);
         check.accept(HiveProgression.awaken(player,base.below())&&CorruptionData.get(level).index()==-1,"first deliberate ritual interaction only arms awakening");
         check.accept(HiveProgression.awaken(player,base.below())&&CorruptionData.get(level).index()==-1,"holding ritual interaction cannot confirm awakening");
-        player.setShiftKeyDown(false); // Opening chat releases held sneak on a real client.
-        check.accept(HiveProgression.confirmAwakening(player)&&CorruptionData.get(level).index()==0&&player.getOffhandItem().getCount()==1,"confirmed ritual consumes exactly one Nether Star and changes minus one to zero");
+        player.setShiftKeyDown(false); // Confirmation through a key or screen does not require holding sneak.
+        check.accept(HiveActionPayload.execute(player,new HiveActionPayload(HiveActionPayload.AWAKEN,BlockPos.ZERO))&&CorruptionData.get(level).index()==0&&player.getMainHandItem().getCount()==1,"confirmed ritual consumes exactly one crafted Spore Catalyst and changes minus one to zero");
+        player.setShiftKeyDown(true);
+        CorruptionData.get(level).set(-1);
+        check.accept(HiveProgression.awaken(player,base.below()),"a second dormant ritual can be armed");
+        player.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND,ItemStack.EMPTY);
+        check.accept(!HiveProgression.confirmAwakening(player)&&CorruptionData.get(level).index()==-1,"confirmation cannot consume a missing catalyst or awaken for free");
+        player.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND,new ItemStack(Sporebound.CATALYST.get()));
         CorruptionData.get(level).set(-2);
         check.accept(!HiveProgression.awaken(player,base.below())&&CorruptionData.get(level).index()==-2,"awakening cannot unlock a purged dimension");
         CorruptionData.get(level).set(-1);player.getInventory().clearContent();

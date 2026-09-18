@@ -21,7 +21,7 @@ public final class Protection {
         return entity instanceof InfectedBiomass || BuiltInRegistries.ENTITY_TYPE.getKey(entity.getType()).getNamespace().equals("spore");
     }
     public static boolean spore(BlockState state) {
-        return state.is(FungalContent.CRUST.get()) || BuiltInRegistries.BLOCK.getKey(state.getBlock()).getNamespace().equals("spore");
+        return (state.is(FungalContent.CRUST.get()) || state.is(FungalContent.PALE.get())) || BuiltInRegistries.BLOCK.getKey(state.getBlock()).getNamespace().equals("spore");
     }
     public static boolean boss(Entity entity) { return entity instanceof Proto || entity instanceof Calamity || entity instanceof TrueCalamity; }
     public static boolean mushroom(Level level, BlockPos pos) {

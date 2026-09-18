@@ -13,6 +13,7 @@ public final class Sporebound {
     public static final String ID = "sporebound";
     public static final net.neoforged.neoforge.registries.DeferredRegister.Items ITEMS = net.neoforged.neoforge.registries.DeferredRegister.createItems(ID);
     public static final java.util.function.Supplier<net.minecraft.world.item.Item> TALISMAN = ITEMS.register("rift_talisman", RiftTalisman::new);
+    public static final java.util.function.Supplier<net.minecraft.world.item.Item> CATALYST = ITEMS.register("spore_catalyst", SporeCatalyst::new);
     public static final net.neoforged.neoforge.registries.DeferredRegister<net.minecraft.world.level.levelgen.feature.Feature<?>> FEATURES = net.neoforged.neoforge.registries.DeferredRegister.create(Registries.FEATURE, ID);
     public static final java.util.function.Supplier<RibFeature> RIBS = FEATURES.register("calcified_ribs", RibFeature::new);
     public static final java.util.function.Supplier<SporeColonyFeature> COLONIES = FEATURES.register("spore_colonies", SporeColonyFeature::new);
@@ -28,6 +29,7 @@ public final class Sporebound {
         NeoForge.EVENT_BUS.register(new HiveProgression());
         NeoForge.EVENT_BUS.register(new SurvivorColonies());
         bus.addListener(HiveSensePayload::register);
+        bus.addListener(HiveActionPayload::register);
         bus.addListener(InfusionPayload::register);
         NeoForge.EVENT_BUS.addListener(HiveCommands::register);
         bus.addListener(EvolutionPayload::register);
@@ -38,7 +40,7 @@ public final class Sporebound {
         bus.addListener((net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent event) ->
             event.enqueueWork(FungalEcology::installTargetPolicy));
         bus.addListener((net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent event) -> {
-            if (event.getTabKey().equals(net.minecraft.world.item.CreativeModeTabs.TOOLS_AND_UTILITIES)) event.accept(TALISMAN.get());
+            if (event.getTabKey().equals(net.minecraft.world.item.CreativeModeTabs.TOOLS_AND_UTILITIES)) { event.accept(TALISMAN.get()); event.accept(CATALYST.get()); }
         });
         NeoForge.EVENT_BUS.register(new WorldRules());
         NeoForge.EVENT_BUS.addListener(RiftCairn::interact);
