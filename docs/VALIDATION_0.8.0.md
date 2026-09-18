@@ -1,9 +1,34 @@
-# 0.8.0 validation status
+# Sporebound 0.8.0 validation
 
-Implementation is saved on the approved development branch; portal additions are being validated. All resource JSON parses successfully.
+Validated code commit: `5e27a833908ecb00a2840342b5423e7b6b78fc02` on `feat/living-frontier-0.8.0`.
 
-New opt-in native checks in `FrontierValidation` cover native Spore grass conversion, exposed/covered soil, spread containment, pale remnant preservation, distant unloaded Hive discovery/removal, both mushroom variants of every inexpensive armor recipe, armor component retention, real climbing mixin behavior, forged ability requests, finite survivor crafting/smelting, save/load, canceled conversion and real infected death without biomass. Existing awakening coverage now calls the new server ability handler with the crafted catalyst. Real-client validation also checks key registration and node selection; its existing armor rendering screenshots use the new texture.
+[GitHub Actions run 35336689768](https://github.com/OuterRingFoundry/SporeAddition/actions/runs/35336689768) passed on 2026-09-18:
 
-Build, server/restart acceptance and client acceptance are pending on the approved development branch `feat/living-frontier-0.8.0`. On 2026-09-18 the user explicitly approved uploading these changes to OuterRingFoundry/SporeAddition and running GitHub Actions. This host cannot run Minecraft/Gradle within its memory/disk budget. No new JAR is claimed to be verified until the workflow passes.
+- Clean build and unit checks on Java 21.
+- 368 fresh-world native checks.
+- Saved entity-region NBT audit: restart fixture persisted with mass 5 and hunger 100.
+- 14 checks after a full server restart.
+- Real Minecraft client acceptance with the locked Civillis dependency and 19 required screenshots.
+- JAR checksum generation and validation artifact upload.
 
-Portal coverage checks first-crossing payment, permanent melting, pearl-free re-entry, mandatory talisman, active arrival generation, obstruction handling, restart persistence and the three-ingredient catalyst recipe. Real-client runs capture both melted portals. The prior client run exposed a chunk-presence assertion using a general level API; the check now queries the actual client chunk cache without fallback creation.
+[Download the validation artifact](https://github.com/OuterRingFoundry/SporeAddition/actions/runs/35336689768/artifacts/10543596296). It contains the JAR, checksum, reports, logs and screenshots. The artifact expires on 2026-12-17; this is a development build, not a main-branch release.
+
+`sporebound-0.8.0.jar` SHA-256:
+
+```
+8e02bf299ea0286edef63dd5e455fadb16baec316d5651bbd30f40a09cef4196
+```
+
+## Coverage
+
+Native frontier checks cover Spore grass conversion, exposed/covered soil, custom mycelium spread containment, pale remnant preservation, distant unloaded Hive discovery/removal, affordable armor recipes with component retention, real climbing behavior, forged ability requests, survivor crafting/smelting and save/load, and infected survivor death becoming one equipped native Infected Adventurer without biomass or duplicated equipment.
+
+Portal checks cover first-crossing payment and melting, re-entry with zero pearls, mandatory talisman, active corrupted-world arrival generation, obstruction handling, shared activation surviving restart, and the shapeless rotten-flesh/red-mushroom/netherrack Spore Catalyst recipe. Awakening confirms through the server ability handler and consumes one catalyst; missing catalysts and purged dimensions are rejected.
+
+Real-client checks exercise the configured network key, network screen, an unloaded Hive marker 50,000 blocks away, and the travel key through a real serverbound packet. Screenshots include the infected armor, Hive controls, distant beacon and both melted portals.
+
+The earlier client assertion used a general level chunk-presence API. The passing version queries the actual client chunk cache with fallback creation disabled. Restart acceptance now waits for entity loading and independently inspects saved NBT before restart; the expected entity data is unchanged.
+
+## Execution scope
+
+The user explicitly approved development-branch upload and GitHub Actions testing. Main was not merged and the release publish job was skipped. This host lacks the Java, memory and disk capacity for the Minecraft checks. Resource JSON, Python syntax and whitespace were checked locally. The artifact download service returned HTTP 403 to this host, so screenshots were captured and checked for presence by CI but were not visually reviewed locally; use the GitHub artifact link above.
