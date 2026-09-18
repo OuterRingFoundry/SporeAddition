@@ -65,8 +65,11 @@ P C P     A = block of amethyst
 ```
 
 Leave three air blocks above all nine blocks. Right-click the amethyst center
-with the talisman while carrying an ender pearl. Each survival entry consumes one
-pearl; the talisman and cairn remain intact. Creative entry is free. Cairns cannot
+with the talisman while carrying an ender pearl. The first successful survival crossing consumes
+one pearl and melts the ritual into a glowing violet core surrounded by fused dark slag.
+Every later entry through that intact melted structure still needs the talisman, but no pearl.
+The shared arrival portal in the Blighted World is generated already melted and active.
+Creative activation is free. Cairns cannot
 activate on Overworld mushroom islands. They can otherwise be built in any external
 dimension, including the Nether and End.
 
@@ -160,7 +163,7 @@ existing underwater turf and damaged structures are not automatically rebuilt.
 | 5–10 | Hive Minds and Calamities permitted, with continuing growth and scaling. |
 
 The Overworld, Nether, End and other external dimensions default to **-1**. The
-Blighted World defaults to **6**. Index -1 can be unlocked deliberately by the two-step amethyst-shard cairn ritual (crouch-use, then the awakening key);
+Blighted World defaults to **6**. Index -1 can be unlocked deliberately by the two-step Spore Catalyst cairn ritual (crafted from one rotten flesh, red mushroom, and netherrack) (crouch-use, then the awakening key);
 -2 requires an OP command. Evolved Hivebound melee infections can raise Index 0.
 Population growth alone never increases -2, -1 or 0. Mushroom fields remain immune at every index.
 Spore structures and template placement are confined to the Blighted World even

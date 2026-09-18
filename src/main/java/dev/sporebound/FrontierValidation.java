@@ -44,6 +44,10 @@ public final class FrontierValidation {
         var player=net.neoforged.neoforge.common.util.FakePlayerFactory.get(level,
             new com.mojang.authlib.GameProfile(UUID.fromString("30000000-0000-0000-0000-000000000008"),"frontier-test"));
         player.moveTo(pos.getX(),pos.getY()+1,pos.getZ());player.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);player.getInventory().clearContent();
+        var catalystInput=CraftingInput.of(3,1,List.of(new ItemStack(Items.NETHERRACK),new ItemStack(Items.RED_MUSHROOM),new ItemStack(Items.ROTTEN_FLESH)));
+        var catalystRecipe=level.getRecipeManager().getRecipeFor(RecipeType.CRAFTING,catalystInput,level);
+        check.accept(catalystRecipe.isPresent()&&catalystRecipe.orElseThrow().value().assemble(catalystInput,level.registryAccess()).is(Sporebound.CATALYST.get()),
+            "one netherrack, red mushroom and rotten flesh craft a Spore Catalyst in any order");
         Item[] bases={Items.IRON_HELMET,Items.IRON_CHESTPLATE,Items.IRON_LEGGINGS,Items.IRON_BOOTS};
         Item[] bound={Hivebound.HELMET.get(),Hivebound.CHEST.get(),Hivebound.LEGS.get(),Hivebound.BOOTS.get()};
         for(int i=0;i<4;i++){

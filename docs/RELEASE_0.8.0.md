@@ -30,7 +30,9 @@ At a smithing table combine **one iron armor piece + one red or brown mushroom i
 
 The organic armor model now uses an original texture of pale fungal plates, dark mycelial veins, mauve tissue and amber spore clusters.
 
-To awaken Index **-1 → 0**, crouch-use a Rift Talisman at a complete cairn with **one amethyst shard** in the offhand, then press **K** within ten seconds while staying at the cairn. The shard is consumed only on successful confirmation. No Nether Star or typed command is needed. Index -2 remains protected.
+To awaken Index **-1 → 0**, craft a **Spore Catalyst** with **one rotten flesh + one red mushroom + one netherrack** (shapeless). Hold it and crouch-use a complete cairn, then press **K** within ten seconds while staying nearby. Confirmation consumes one catalyst. Both original and melted cairns work. Index -2 remains protected.
+
+A cairn's first successful crossing consumes one ender pearl and melts its nine blocks into a violet core and fused dark slag. Later crossings through that shared structure require the Rift Talisman but no pearl. Activation survives reloads. An incomplete or obstructed cairn is unusable; failed travel does not charge a pearl or activate it. The corrupted world's arrival cairn generates already melted and active; intact arrival cairns from older saves also acquire this form. Empty-hand return remains free.
 
 ## Survivors
 

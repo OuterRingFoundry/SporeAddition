@@ -46,8 +46,9 @@ public final class FrontierClientValidation {
             check.accept(true,"configured Hive network key opens the real control screen");screenshot.accept("16-hive-network-controls.png");
             mc.setScreen(null);select(remote);phase=3;ticks=0;
         }else if(phase==3&&++ticks>=20){
-            check.accept(HiveControls.selection()!=null&&HiveControls.selection().pos().equals(remote)
-                &&!mc.level.hasChunkAt(remote),"selected Hive beacon remains available fifty thousand blocks away without a client chunk");
+            check.accept(HiveControls.selection()!=null&&HiveControls.selection().pos().equals(remote),"selected Hive beacon remains available fifty thousand blocks away");
+            check.accept(mc.level.getChunkSource().getChunk(remote.getX()>>4,remote.getZ()>>4,
+                net.minecraft.world.level.chunk.status.ChunkStatus.FULL,false)==null,"distant beacon does not require an actual client chunk");
             screenshot.accept("17-distant-hive-beacon.png");select(destination);KeyMapping.click(HiveControls.TRAVEL.getKey());phase=4;
         }else if(phase==4){
             if(!destination.above().closerToCenterThan(mc.player.position(),3))return false;

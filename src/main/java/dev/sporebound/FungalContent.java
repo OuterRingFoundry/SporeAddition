@@ -18,6 +18,11 @@ public final class FungalContent {
         () -> new SporeMyceliumBlock(BlockBehaviour.Properties.of().strength(0.6F).sound(SoundType.GRAVEL).randomTicks()));
     public static final java.util.function.Supplier<Block> PALE = BLOCKS.register("pale_remnant",
         () -> new Block(BlockBehaviour.Properties.of().strength(1.5F, 3).sound(SoundType.WART_BLOCK)));
+    // Activated cairns are structural, never craftable or dropped as portable activation tokens.
+    public static final java.util.function.Supplier<Block> RIFT_CORE = BLOCKS.register("melted_rift_core",
+        () -> new Block(BlockBehaviour.Properties.of().strength(50,1200).sound(SoundType.AMETHYST).lightLevel(s -> 12).noLootTable()));
+    public static final java.util.function.Supplier<Block> RIFT_SLAG = BLOCKS.register("rift_slag",
+        () -> new Block(BlockBehaviour.Properties.of().strength(50,1200).sound(SoundType.DEEPSLATE).lightLevel(s -> 3).noLootTable()));
     public static final java.util.function.Supplier<EntityType<InfectedBiomass>> BIOMASS = ENTITIES.register("infected_biomass",
         () -> EntityType.Builder.of(InfectedBiomass::new, MobCategory.MONSTER).sized(0.9F, 0.5F)
             .clientTrackingRange(8).updateInterval(2).build("sporebound:infected_biomass"));

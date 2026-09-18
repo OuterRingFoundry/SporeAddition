@@ -61,7 +61,7 @@ public final class ClientValidation {
                 && mc.player.getInventory().countItem(Items.ENDER_PEARL)==2;
             case 400 -> holdingTalisman() && serverTravelReady && !mc.player.getCooldowns().isOnCooldown(Sporebound.TALISMAN.get());
             case 520 -> atCairn(departure) && holdingTalisman()
-                && mc.player.getInventory().countItem(Items.ENDER_PEARL)==1
+                && mc.player.getInventory().countItem(Items.ENDER_PEARL)==0
                 && serverTravelReady && !mc.player.getCooldowns().isOnCooldown(Sporebound.TALISMAN.get());
             case 280,320,610 -> mc.level.dimension().equals(Sporebound.BLIGHT)
                 && state!=null && state.dimension().equals(Sporebound.BLIGHT.location()) && state.index()>=6;
@@ -120,7 +120,9 @@ public final class ClientValidation {
                 var player=mc.getSingleplayerServer().getPlayerList().getPlayers().getFirst();
                 check(player.getY()>player.level().getMinBuildHeight()+4 && player.level().noCollision(player),"arrival is above bedrock and collision free");
                 check(player.level().getBlockState(player.blockPosition().below()).isSolid(),"arrival has a solid landing surface");
-                check(player.getInventory().countItem(Items.ENDER_PEARL)==1,"entry consumes exactly one pearl in survival");
+                check(player.getInventory().countItem(Items.ENDER_PEARL)==1,"first entry consumes exactly one pearl in survival");
+                check(RiftCairn.active(mc.getSingleplayerServer().overworld(),departure),"successful crossing permanently melts the departure structure");
+                check(RiftCairn.active(player.serverLevel(),ArrivalData.get(player.serverLevel()).center(player.serverLevel())),"corrupted-world portal is already melted and activated");
             });
         }
         if(ticks==320){
@@ -159,11 +161,16 @@ public final class ClientValidation {
                 var player=mc.getSingleplayerServer().getPlayerList().getPlayers().getFirst();
                 check(player.level().noCollision(player)&&!player.blockPosition().equals(departure.offset(2,1,0)),"blocked departure relocates player safely without digging");
                 check(player.getInventory().countItem(Items.ENDER_PEARL)==1,"talisman return costs no pearl");
+                for(int i=0;i<player.getInventory().getContainerSize();i++)
+                    if(player.getInventory().getItem(i).is(Items.ENDER_PEARL))player.getInventory().removeItemNoUpdate(i);
+                player.setItemInHand(InteractionHand.MAIN_HAND,ItemStack.EMPTY);
+                check(!RiftCairn.enter(player,departure)&&player.level().dimension().equals(net.minecraft.world.level.Level.OVERWORLD),"melted rift still rejects entry without a talisman");
+                player.setItemInHand(InteractionHand.MAIN_HAND,new ItemStack(Sporebound.TALISMAN.get()));
             });
         }
-        if(ticks==520)click(departure);
+        if(ticks==520){shot("18-melted-departure.png");click(departure);}
         if(ticks==610){
-            check(mc.level.dimension().equals(Sporebound.BLIGHT),"second cairn entry succeeds");
+            check(mc.level.dimension().equals(Sporebound.BLIGHT),"melted cairn re-entry succeeds with no ender pearls");
             mc.getSingleplayerServer().execute(()->{
                 var player=mc.getSingleplayerServer().getPlayerList().getPlayers().getFirst();
                 player.setItemInHand(InteractionHand.MAIN_HAND,ItemStack.EMPTY);
@@ -171,7 +178,7 @@ public final class ClientValidation {
                 player.teleportTo(player.serverLevel(),center.getX()+2.5,center.getY()+1,center.getZ()+0.5,Set.of(),90,35);
             });
         }
-        if(ticks==640)click(arrival);
+        if(ticks==640){shot("19-melted-arrival.png");click(arrival);}
         if(ticks==700){
             check(mc.level.dimension().equals(net.minecraft.world.level.Level.OVERWORLD),"empty-handed cairn use returns without a talisman or pearl");
         }
@@ -245,7 +252,7 @@ public final class ClientValidation {
     private static boolean atCairn(BlockPos pos) {
         var mc=Minecraft.getInstance();
         return pos!=null && mc.player.distanceToSqr(Vec3.atCenterOf(pos))<16
-            && mc.level.getBlockState(pos).is(Blocks.AMETHYST_BLOCK);
+            && (mc.level.getBlockState(pos).is(Blocks.AMETHYST_BLOCK)||mc.level.getBlockState(pos).is(FungalContent.RIFT_CORE.get()));
     }
     private static void useTalisman() {
         var mc=Minecraft.getInstance();interactionServerTick=serverTicks;

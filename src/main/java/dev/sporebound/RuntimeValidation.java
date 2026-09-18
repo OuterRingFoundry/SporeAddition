@@ -308,8 +308,14 @@ public final class RuntimeValidation {
         overworld.setBlock(center.above(3),Blocks.AIR.defaultBlockState(),3);
         overworld.setBlock(center.east(),Blocks.OBSIDIAN.defaultBlockState(),3);
         require(!RiftCairn.complete(overworld,center),"ordinary obsidian cannot substitute crying obsidian");
+        require(!RiftCairn.melt(overworld,center),"damaged cairn cannot melt or repair itself");
+        overworld.setBlock(center.east(),Blocks.CRYING_OBSIDIAN.defaultBlockState(),3);
+        require(RiftCairn.melt(overworld,center)&&RiftCairn.active(overworld,center),"intact cairn becomes a complete fused rift");
+        overworld.setBlock(center.above(),Blocks.STONE.defaultBlockState(),3);
+        require(!RiftCairn.active(overworld,center),"melted rifts still require unobstructed headroom");
+        overworld.setBlock(center.above(),Blocks.AIR.defaultBlockState(),3);
         var arrival=ArrivalData.get(blight).center(blight);
-        require(RiftCairn.complete(blight,arrival),"arrival cairn complete above real generated terrain");
+        require(RiftCairn.active(blight,arrival),"arrival cairn generates already melted and activated above terrain");
         require(ArrivalData.get(blight).center(blight).equals(arrival),"arrival anchor remains fixed on repeated visits");
         var ribOrigin=new BlockPos(32,260,32);blight.getChunkAt(ribOrigin);
         for(int x=-4;x<=4;x++)for(int z=-4;z<=4;z++)blight.setBlock(ribOrigin.offset(x,-1,z),Blocks.STONE.defaultBlockState(),3);
@@ -336,7 +342,9 @@ public final class RuntimeValidation {
         require(CorruptionData.get(blight).index()==4.25,"custom index survives restart");
         require(!SurvivorColonies.get(blight).homes().isEmpty(),"survivor colony ledger survives process restart");
         for(int i=0;i<FoundingHives.SITES.length;i++)require(CorruptionData.get(blight).seeded(i),"founder marker survives restart "+i);
-        require(RiftCairn.complete(blight,ArrivalData.get(blight).center(blight)),"arrival cairn and coordinate survive restart");
+        require(RiftCairn.active(blight,ArrivalData.get(blight).center(blight)),"melted arrival cairn and coordinate survive restart");
+        var savedRift=new BlockPos(96,250,96);server.overworld().getChunkAt(savedRift);
+        require(RiftCairn.active(server.overworld(),savedRift),"shared melted departure activation survives a full restart");
         set(blight,6);FoundingHives.seed(blight);
         int count=0;for(var entity:blight.getAllEntities())if(entity instanceof com.Harbinger.Spore.Sentities.Organoids.Proto)count++;
         require(count==0,"defeated founding hives never respawn after restart");
