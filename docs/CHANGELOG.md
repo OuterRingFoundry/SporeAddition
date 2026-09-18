@@ -1,4 +1,18 @@
-# 0.5.0 — living infestation
+# Changelog
+
+[Documentation](README.md) · [GitHub Releases](https://github.com/OuterRingFoundry/SporeAddition/releases)
+
+Older entries describe behavior at that release. Current recipes and controls are in the [player guide](PLAYER_GUIDE.md).
+
+## 0.8.0 — The Living Frontier
+
+- Restored pale fungal terrain and custom mycelium spread.
+- Configurable Hive controls, a network screen, distant Hive beacons, and Evolved wall climbing.
+- Affordable Hivebound armor and a craftable Spore Catalyst awakening ritual.
+- Shared cairn activation: the first successful crossing costs a pearl; later crossings through that cairn do not.
+- Survivor experience, equipment crafting, mining, smelting, and native Infected Adventurer conversion.
+- Coordinated survivor squads with archers, shields, supply sharing, and persisted combat roles.
+- [Release notes](RELEASE_0.8.0.md) · [Validation](VALIDATION.md) · [Download](https://github.com/OuterRingFoundry/SporeAddition/releases/tag/v0.8.0)
 
 ## 0.7.0 — The Collective
 
@@ -10,6 +24,14 @@
 - Natural founding Hive placement and vanilla-based Spore Mycelium visuals.
 - See [mechanics](RELEASE_0.7.0.md) and [validation](VALIDATION_0.7.0.md).
 
+## 0.6.0 — Hive symbiosis
+
+- Cooperative Hive biomass sharing and craftable Hivebound armor.
+- Spore kinship, evolution, and followers.
+- A corruption bar that changes from meadow to infestation.
+- [Recipes and mechanics](RELEASE_0.6.0.md)
+
+## 0.5.0 — Living infestation
 
 Spore colonies and distinct infested soil replace vanilla mushrooms and mycelium
 in corrupted regions. Biomass yield scales with victim maximum health; lumps seek
@@ -20,7 +42,7 @@ Biomass now starves gradually, scavenges native corpses/remains, weakly attacks
 prey, and assimilates surplus idle basic infected. Corrupted Civillis Wilderness
 uses the Caution HUD state. See [mechanics and validation scope](RELEASE_0.5.0.md).
 
-# 0.4.0 — fungal remnants
+## 0.4.0 — fungal remnants
 
 - Corruption-dependent rose/mauve sky and discolored clouds.
 - Original Remnant Mycelial Crust replaces generated calcite surface/rib blocks.
@@ -33,7 +55,7 @@ uses the Caution HUD state. See [mechanics and validation scope](RELEASE_0.5.0.m
 See [0.4 verification and limitations](INFECTED_BIOMASS.md). New terrain changes
 apply to newly generated chunks. The release includes the JAR and its SHA-256 checksum.
 
-# 0.3.0-dev — terrain and atmosphere update
+## 0.3.0-dev — terrain and atmosphere update
 
 - Water-aware sediment surface rules in the Blighted World.
 - Whole-start Spore ruin terrain checks and dry-ground projection; supported rib feet.
@@ -48,7 +70,7 @@ apply to newly generated chunks. The release includes the JAR and its SHA-256 ch
 Generation fixes affect new chunks. Validation results for this build are recorded
 separately from the historical 0.2 release below.
 
-# 0.2.0-dev
+## 0.2.0-dev
 
 - Rift Cairn ritual: reusable talisman, one pearl per survival entry, free recall,
   personal return position, shared arrival cairn and an empty-handed escape route.

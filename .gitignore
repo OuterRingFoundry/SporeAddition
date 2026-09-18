@@ -9,3 +9,11 @@ compatibility/mods/
 *.reference
 release/
 client-screen.png
+
+# Local tooling and verification output
+__pycache__/
+*.py[cod]
+docs/*_LOCAL_MANIFEST.json
+# Current binaries and screenshots belong in GitHub Releases / CI artifacts.
+# Retain the already tracked historical 0.2 artifact.
+releases/*/

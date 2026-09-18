@@ -1,0 +1,54 @@
+name: Bug report
+description: Report a reproducible Sporebound problem.
+title: "[Bug]: "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Check the installation guide and existing issues first. Remove private addresses, tokens, and personal information from logs.
+  - type: input
+    id: versions
+    attributes:
+      label: Versions
+      description: Sporebound, Spore, Minecraft, NeoForge, and Java versions.
+      placeholder: Sporebound 0.8.0; Spore 2.2.0j; Minecraft 1.21.1; NeoForge 21.1.249; Java 21
+    validations:
+      required: true
+  - type: dropdown
+    id: environment
+    attributes:
+      label: Environment
+      options:
+        - Singleplayer
+        - Dedicated server and client
+    validations:
+      required: true
+  - type: textarea
+    id: mods
+    attributes:
+      label: Other mods
+      description: Include exact versions, especially Civillis and ConcentricWorld. State whether the issue also occurs with only required dependencies.
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to reproduce
+      description: Include the dimension, relevant corruption index, and whether the world is new or upgraded.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Logs and screenshots
+      description: Attach the relevant latest.log, crash report, or screenshots after removing private information.

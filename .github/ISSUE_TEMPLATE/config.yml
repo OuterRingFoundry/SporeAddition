@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Installation and troubleshooting
+    url: https://github.com/OuterRingFoundry/SporeAddition/blob/main/docs/INSTALLATION.md
+    about: Check required versions, setup, upgrades, and common problems.
+  - name: Player guide
+    url: https://github.com/OuterRingFoundry/SporeAddition/blob/main/docs/PLAYER_GUIDE.md
+    about: Find recipes, controls, progression, and commands.
