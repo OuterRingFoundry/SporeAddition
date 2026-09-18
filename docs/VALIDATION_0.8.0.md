@@ -1,22 +1,22 @@
 # Sporebound 0.8.0 validation
 
-Validated code commit: `5e27a833908ecb00a2840342b5423e7b6b78fc02` on `feat/living-frontier-0.8.0`.
+Validated code commit: `15cb61e5c6c0aaa7d8fe8c1ba73945f2870045b9` on `feat/living-frontier-0.8.0`.
 
-[GitHub Actions run 35336689768](https://github.com/OuterRingFoundry/SporeAddition/actions/runs/35336689768) passed on 2026-09-18:
+[GitHub Actions run 35339186265](https://github.com/OuterRingFoundry/SporeAddition/actions/runs/35339186265) passed on 2026-09-18:
 
 - Clean build and unit checks on Java 21.
-- 368 fresh-world native checks.
+- 386 fresh-world native checks.
 - Saved entity-region NBT audit: restart fixture persisted with mass 5 and hunger 100.
 - 14 checks after a full server restart.
-- Real Minecraft client acceptance with the locked Civillis dependency and 19 required screenshots.
+- Real Minecraft client acceptance with the locked Civillis dependency and 20 required screenshots.
 - JAR checksum generation and validation artifact upload.
 
-[Download the validation artifact](https://github.com/OuterRingFoundry/SporeAddition/actions/runs/35336689768/artifacts/10543596296). It contains the JAR, checksum, reports, logs and screenshots. The artifact expires on 2026-12-17; this is a development build, not a main-branch release.
+[Download the validation artifact](https://github.com/OuterRingFoundry/SporeAddition/actions/runs/35339186265/artifacts/10544975079). It contains the JAR, checksum, reports, logs and screenshots. The artifact expires on 2026-12-17; this is a development build, not a main-branch release.
 
 `sporebound-0.8.0.jar` SHA-256:
 
 ```
-8e02bf299ea0286edef63dd5e455fadb16baec316d5651bbd30f40a09cef4196
+674640326b4f34a932be7861f0f813842a69e35ab190202c7d07b4e36970a93b
 ```
 
 ## Coverage
@@ -35,4 +35,5 @@ The user explicitly approved development-branch upload and GitHub Actions testin
 
 ## Survivor squad follow-up
 
-The cooperation/bow/shield follow-up is pending a new development-branch CI run; the passing run above validates the preceding portal build. Added native checks cover colony composition, ally alerts, real projectile ownership, ammunition and durability costs, friendly fire, shot obstruction by allies, sword fallback/resupply, food transfer, role persistence, directional shield protection, axe disabling, and replacement recipes. The real-client suite now requires a twentieth screenshot showing a drawing archer and blocking defender.
+The cooperation/bow/shield follow-up passed in the run linked above. Native checks cover colony composition, ally alerts, real projectile ownership, ammunition and durability costs, friendly fire, shot obstruction by allies, sword fallback/resupply, food transfer, role persistence, directional shield protection, axe disabling, and replacement recipes. The real-client suite passed with a twentieth screenshot showing a drawing archer and blocking defender and verified synchronized use of both hands.
+
