@@ -36,12 +36,19 @@ public final class RuntimeValidation {
         require(blight!=null,"dimension exists");
         blight.setChunkForced(176>>4,176>>4,true);
         blight.getChunk(176>>4,176>>4);
+        // Reassert a runtime ticket even when the saved forced-chunk entry already exists.
+        var fixtureChunk=new net.minecraft.world.level.ChunkPos(176>>4,176>>4);
+        blight.getChunkSource().addRegionTicket(net.minecraft.server.level.TicketType.FORCED,fixtureChunk,2,fixtureChunk);
         for(var site:FoundingHives.SITES)blight.getChunk(site[0]>>4,site[1]>>4);
     }
     public static void tick(ServerTickEvent.Post event) {
         if(mode==null||ran||++ticks<80)return;
+        var fixture=event.getServer().getLevel(Sporebound.BLIGHT);
+        boolean entitiesReady=fixture.areEntitiesLoaded(net.minecraft.world.level.ChunkPos.asLong(176>>4,176>>4));
+        if(!entitiesReady&&ticks<600)return;
         ran=true;
         try {
+            require(entitiesReady,"fixture entity chunk completes asynchronous loading before validation");
             if(mode.endsWith("read"))read(event.getServer());else write(event.getServer());
             System.out.println("SPOREBOUND ACCEPTANCE PASS: "+mode+" checks="+checks);
             event.getServer().halt(false);
