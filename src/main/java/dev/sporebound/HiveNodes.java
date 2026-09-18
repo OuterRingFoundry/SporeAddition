@@ -71,7 +71,7 @@ public final class HiveNodes extends SavedData {
     public List<Node> available(ServerLevel level) {
         if (nodes.values().removeIf(n -> n.mind() ? !HivePopulation.get(level).contains(n.hive)
             : level.hasChunkAt(n.pos) && !blockNode(level,n.pos))) setDirty();
-        return nodes.values().stream().filter(n -> !Protection.sterile(level,n.pos)).limit(128).toList();
+        return nodes.values().stream().filter(n -> !Protection.sterile(level,n.pos)).sorted(Comparator.comparing((Node n)->!n.mind())).limit(128).toList();
     }
     public static boolean travel(ServerPlayer player, int index) {
         ServerLevel level=player.serverLevel();

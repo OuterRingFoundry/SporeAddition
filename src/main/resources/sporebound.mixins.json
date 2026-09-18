@@ -26,7 +26,9 @@
     "HiveboundRaidMixin",
     "HiveboundVanishingMixin",
     "HiveboundKillMixin",
-    "ChunkUnloadBudgetMixin"
+    "ChunkUnloadBudgetMixin",
+    "SporeSoilMixin",
+    "HiveClimbingMixin"
   ],
   "injectors": {
     "defaultRequire": 1

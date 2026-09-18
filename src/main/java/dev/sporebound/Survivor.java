@@ -23,6 +23,20 @@ public final class Survivor extends PathfinderMob {
     private static final EntityDataAccessor<Integer> SKIN=SynchedEntityData.defineId(Survivor.class,EntityDataSerializers.INT);
     private final SimpleContainer supplies=new SimpleContainer(18);
     private BlockPos home;
+    private int experience,fuel;
+    private boolean furnace;
+    private ItemStack miningTool=new ItemStack(Items.STONE_PICKAXE);
+    public int experience(){return experience;}
+    public void learn(int amount){experience=(int)Math.clamp((long)experience+Math.max(0,amount),0,10000);SurvivorProgression.refresh(this);}
+    public boolean hasFurnace(){return furnace;}
+    public void makeFurnace(){furnace=true;}
+    public int fuel(){return fuel;}
+    public void addFuel(int amount){fuel=Math.clamp(fuel+amount,0,8);}
+    public ItemStack miningTool(){return miningTool;}
+    public void setMiningTool(ItemStack tool){miningTool=tool;}
+    @Override public void awardKillScore(Entity victim,int score,net.minecraft.world.damagesource.DamageSource source){
+        super.awardKillScore(victim,score,source);if(victim instanceof LivingEntity&&(Protection.spore(victim)||victim instanceof Enemy))learn(6);
+    }
     public Survivor(EntityType<? extends Survivor> type,Level level){super(type,level);setPersistenceRequired();}
     public static AttributeSupplier.Builder attributes(){return Mob.createMobAttributes().add(Attributes.MAX_HEALTH,24)
         .add(Attributes.ATTACK_DAMAGE,4).add(Attributes.MOVEMENT_SPEED,0.29).add(Attributes.FOLLOW_RANGE,96);}
@@ -52,7 +66,7 @@ public final class Survivor extends PathfinderMob {
             ||distanceToSqr(item)>4||!hasLineOfSight(item))return false;
         int before=item.getItem().getCount();var remaining=supplies.addItem(item.getItem().copy());
         if(remaining.getCount()==before)return false;
-        if(remaining.isEmpty())item.discard();else item.setItem(remaining);return true;
+        if(remaining.isEmpty())item.discard();else item.setItem(remaining);learn(Math.min(4,before-remaining.getCount()));return true;
     }
     public boolean pay(Item item){for(int i=0;i<supplies.getContainerSize();i++)if(supplies.getItem(i).is(item)){supplies.removeItem(i,1);return true;}return false;}
     public Item buildingMaterial(){
@@ -76,6 +90,7 @@ public final class Survivor extends PathfinderMob {
         if(tickCount%20==0){
             for(var item:server.getEntitiesOfClass(ItemEntity.class,getBoundingBox().inflate(1.5)))collect(item);
             if(home==null)settle(blockPosition());craftPlanks(server);
+            if(tickCount%100==0)SurvivorProgression.improve(this);
             if(getHealth()<getMaxHealth()&&tickCount%100==0)for(int i=0;i<supplies.getContainerSize();i++){
                 var stack=supplies.getItem(i);var food=stack.get(net.minecraft.core.component.DataComponents.FOOD);
                 if(food!=null){stack.shrink(1);heal(Math.max(1,food.nutrition()));break;}
@@ -84,23 +99,31 @@ public final class Survivor extends PathfinderMob {
     }
     @Override protected void dropCustomDeathLoot(net.minecraft.server.level.ServerLevel level,net.minecraft.world.damagesource.DamageSource source,boolean recentlyHit){
         super.dropCustomDeathLoot(level,source,recentlyHit);Containers.dropContents(level,blockPosition(),supplies);supplies.clearContent();
+        if(!miningTool.isEmpty())spawnAtLocation(miningTool);miningTool=ItemStack.EMPTY;
     }
     @Override public void addAdditionalSaveData(CompoundTag tag){super.addAdditionalSaveData(tag);tag.putInt("SurvivorSkin",skin());
+        tag.putInt("Experience",experience);tag.putInt("SmeltingFuel",fuel);tag.putBoolean("Furnace",furnace);tag.put("MiningTool",miningTool.save(registryAccess()));
         if(home!=null)tag.putLong("ColonyHome",home.asLong());var list=new ListTag();
         for(int i=0;i<supplies.getContainerSize();i++)if(!supplies.getItem(i).isEmpty()){
             var t=new CompoundTag();t.putInt("Slot",i);t.put("Item",supplies.getItem(i).save(registryAccess()));list.add(t);}
         tag.put("Supplies",list);
     }
     @Override public void readAdditionalSaveData(CompoundTag tag){super.readAdditionalSaveData(tag);entityData.set(SKIN,Math.clamp(tag.getInt("SurvivorSkin"),0,8));
+        experience=Math.clamp(tag.getInt("Experience"),0,10000);fuel=Math.clamp(tag.getInt("SmeltingFuel"),0,8);furnace=tag.getBoolean("Furnace");
+        if(tag.contains("MiningTool"))miningTool=ItemStack.parseOptional(registryAccess(),tag.getCompound("MiningTool"));
+        SurvivorProgression.refresh(this);
         if(tag.contains("ColonyHome"))settle(BlockPos.of(tag.getLong("ColonyHome")));supplies.clearContent();
         for(var entry:tag.getList("Supplies",Tag.TAG_COMPOUND)){var t=(CompoundTag)entry;int slot=t.getInt("Slot");
             if(slot>=0&&slot<supplies.getContainerSize())supplies.setItem(slot,ItemStack.parseOptional(registryAccess(),t.getCompound("Item")));}
     }
     static boolean resource(ServerLevel level,BlockPos pos){
         var state=level.getBlockState(pos);if(state.hasBlockEntity()||state.getDestroySpeed(level,pos)<0)return false;
-        return state.is(BlockTags.COAL_ORES)||state.is(BlockTags.IRON_ORES)||state.is(BlockTags.COPPER_ORES)
+        return state.is(BlockTags.COAL_ORES)||state.is(BlockTags.IRON_ORES)||state.is(BlockTags.COPPER_ORES)||state.is(BlockTags.DIAMOND_ORES)
             ||state.is(Blocks.STONE)||state.is(Blocks.DEEPSLATE)||state.is(Blocks.BLACKSTONE)||state.is(BlockTags.LOGS)
             ||state.getBlock() instanceof CropBlock crop&&crop.isMaxAge(state);
+    }
+    boolean canMine(ServerLevel level,BlockPos pos){
+        var state=level.getBlockState(pos);return !state.requiresCorrectToolForDrops()||miningTool.isCorrectToolForDrops(state);
     }
     private final class WorkGoal extends Goal {
         private BlockPos work;private ItemEntity drop;private int clock,progress;
@@ -111,7 +134,7 @@ public final class Survivor extends PathfinderMob {
                 .stream().min(Comparator.comparingDouble(Survivor.this::distanceToSqr)).orElse(null);
             work=null;if(drop!=null)return true;
             if(EventHooks.canEntityGrief(server,Survivor.this))for(var pos:BlockPos.betweenClosed(blockPosition().offset(-6,0,-6),blockPosition().offset(6,2,6))){
-                if(!server.hasChunkAt(pos)||!resource(server,pos)||SurvivorColonies.get(server).protectedSite(pos)||java.util.Arrays.stream(net.minecraft.core.Direction.values()).noneMatch(d->server.getBlockState(pos.relative(d)).isAir()))continue;
+                if(!server.hasChunkAt(pos)||!resource(server,pos)||!canMine(server,pos)||SurvivorColonies.get(server).protectedSite(pos)||java.util.Arrays.stream(net.minecraft.core.Direction.values()).noneMatch(d->server.getBlockState(pos.relative(d)).isAir()))continue;
                 var path=getNavigation().createPath(pos,1);if(path!=null&&path.canReach()){work=pos.immutable();return true;}
             }
             work=SurvivorColonies.get(server).patrol(home,random.nextBoolean());return work!=null;
@@ -122,14 +145,18 @@ public final class Survivor extends PathfinderMob {
             if(drop!=null){if(distanceToSqr(drop)<4){collect(drop);clock=400;}else if(clock%10==0)getNavigation().moveTo(drop,1);return;}
             if(work.closerToCenterThan(position(),3)){
                 getNavigation().stop();if(!(level() instanceof ServerLevel server))return;
-                if(resource(server,work)&&!SurvivorColonies.get(server).protectedSite(work)&&EventHooks.canEntityGrief(server,Survivor.this)){
+                if(resource(server,work)&&canMine(server,work)&&!SurvivorColonies.get(server).protectedSite(work)&&EventHooks.canEntityGrief(server,Survivor.this)){
                     getLookControl().setLookAt(work.getX()+0.5,work.getY()+0.5,work.getZ()+0.5);swing(InteractionHand.MAIN_HAND);
                     if(++progress>=40){
                         var hit=server.clip(new net.minecraft.world.level.ClipContext(getEyePosition(),net.minecraft.world.phys.Vec3.atCenterOf(work),
                             net.minecraft.world.level.ClipContext.Block.COLLIDER,net.minecraft.world.level.ClipContext.Fluid.NONE,Survivor.this));
                         if(hit.getBlockPos().equals(work)) {
-                            var loot=Block.getDrops(server.getBlockState(work),server,work,null,Survivor.this,new ItemStack(Items.IRON_PICKAXE));
-                            if(server.destroyBlock(work,false,Survivor.this))for(var stack:loot){var left=supplies.addItem(stack);if(!left.isEmpty())spawnAtLocation(left);}
+                            var loot=Block.getDrops(server.getBlockState(work),server,work,null,Survivor.this,miningTool);
+                            if(server.destroyBlock(work,false,Survivor.this)){
+                                for(var stack:loot){var left=supplies.addItem(stack);if(!left.isEmpty())spawnAtLocation(left);}learn(2);
+                                if(miningTool.isDamageableItem()){miningTool.setDamageValue(miningTool.getDamageValue()+1);
+                                    if(miningTool.getDamageValue()>=miningTool.getMaxDamage())miningTool=ItemStack.EMPTY;}
+                            }
                         }clock=400;
                     }
                 }else clock=400;

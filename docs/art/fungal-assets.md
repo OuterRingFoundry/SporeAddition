@@ -15,3 +15,9 @@ Remnant Mycelial Crust:
 Infected Biomass:
 
 > Use case: stylized-concept. Create a single seamless square 1024x1024 PNG texture for a Minecraft infected biomass creature. Flat orthographic surface filling full frame, no perspective, no objects, no border, no lettering. Pixel-art texture visually 32x32 pixels: slimy muted dusty pink and mauve flesh with thin chalk ivory mycelium threads, gray olive small fungal pores and pale fungal flecks. Gentle highlights make it damp and living. Original game art, restrained color contrast, seamless edges, no anatomy, no face, no eyes, not a rendered cube. Every area is textured and opaque.
+
+## Hivebound armor — 2026-09-18
+
+Built-in imagegen output, mechanically resized with nearest-neighbor sampling to 128×128; no third-party armor pixels copied. Project asset: `src/main/resources/assets/sporebound/textures/armor/hivebound.png`.
+
+Prompt: "Use case: stylized-concept. Asset type: seamless square Minecraft fungal armor texture atlas material, flat orthographic, completely opaque tile filling every pixel. Create original pixel art for heavily spore-infected biological armor. Dense chalk ivory fungal plates divided by dark olive and dusty purple branching mycelial veins, clusters of small amber spore pustules, mottled mauve living tissue in gaps, sparse luminous yellow-green fungal pores. Visually 64x64 crisp block pixels, texture only, seamless edge repeat, uniform even light, no gradients, no perspective, no rendered armor or humanoid, no text, no border, no empty background. Palette predominantly pale bone with strong dark green fungal networks and rich mauve shadows. This material will tile across an existing 3D exoskeleton model, so distribute the fungal plates and spores evenly."

@@ -27,5 +27,16 @@
   "item.sporebound.hivebound.symbiosis": "Full set: Spore kinship and evolution. Corruption strengthens you; clean worlds weaken you.",
   "item.sporebound.hivebound.evolution": "Feeds on you. Earn evolution by kills; crouch + empty-hand interact to consume weaker infected.",
   "entity.sporebound.survivor": "Survivor",
-  "item.sporebound.survivor_spawn_egg": "Survivor Spawn Egg"
+  "item.sporebound.survivor_spawn_egg": "Survivor Spawn Egg",
+  "block.sporebound.pale_remnant": "Pale Mycelial Remnant",
+  "key.categories.sporebound": "Sporebound",
+  "key.sporebound.network": "Open Hive network",
+  "key.sporebound.next_node": "Select next Hive node",
+  "key.sporebound.travel": "Travel to selected Hive node",
+  "key.sporebound.deploy": "Deploy to Hive assignment",
+  "key.sporebound.awaken": "Confirm cairn awakening",
+  "screen.sporebound.network": "Hive Network",
+  "message.sporebound.action_success": "The Hive answers.",
+  "message.sporebound.awakening_failed": "Crouch-use a Rift Talisman at a complete cairn with an amethyst shard offhand, then confirm within 10 seconds. Requires Index -1.",
+  "message.sporebound.travel_failed": "Travel requires Hyper evolution, a node within 12 blocks, a safe destination, and a ready 30-second cooldown."
 }

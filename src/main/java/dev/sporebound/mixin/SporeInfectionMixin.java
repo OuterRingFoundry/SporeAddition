@@ -12,6 +12,7 @@ public abstract class SporeInfectionMixin {
     private static void sporebound$conversion(LivingDeathEvent event,CallbackInfo ci) {
         if(event.getEntity().level() instanceof ServerLevel level && Protection.sterile(level,event.getEntity().blockPosition())) { ci.cancel(); return; }
         dev.sporebound.FungalEcology.prepareConversion(event);
+        if(dev.sporebound.SurvivorConversion.convert(event))ci.cancel();
     }
     @Inject(method="onEntityDeath",at=@At("TAIL"))
     private static void sporebound$biomass(LivingDeathEvent event,CallbackInfo ci) {

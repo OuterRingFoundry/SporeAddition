@@ -70,6 +70,7 @@ public final class RuntimeValidation {
         HiveBurrowingValidation.run(blight, RuntimeValidation::require);
         HiveboundValidation.run(blight, RuntimeValidation::require);
         CollectiveValidation.run(blight, RuntimeValidation::require);
+        FrontierValidation.run(blight, RuntimeValidation::require);
         int founders=0;
         for(var entity:blight.getAllEntities())if(entity instanceof com.Harbinger.Spore.Sentities.Organoids.Proto)founders++;
         require(founders==1,"exactly one initial Hive Mind: "+founders);
@@ -309,7 +310,7 @@ public final class RuntimeValidation {
             blight,generator,net.minecraft.util.RandomSource.create(913),ribOrigin),"calcified rib feature places in corrupted world");
         int calcite=0,light=0;
         for(var block:BlockPos.betweenClosed(ribOrigin.offset(-4,0,-4),ribOrigin.offset(4,14,4))) {
-            if(blight.getBlockState(block).is(FungalContent.CRUST.get()))calcite++;
+            if(blight.getBlockState(block).is(FungalContent.PALE.get()))calcite++;
             if(blight.getBlockState(block).is(Blocks.SHROOMLIGHT))light++;
         }
         require(calcite>15&&light>0&&blight.getBlockState(ribOrigin.above(2)).isAir(),"mycelial ribs form an open arch with luminous tips");

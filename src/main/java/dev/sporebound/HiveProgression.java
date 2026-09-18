@@ -13,11 +13,11 @@ import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 
 public final class HiveProgression {
-    /** A deliberate two-step ritual: arm at a cairn, then explicitly confirm with a command. */
+    /** A deliberate two-step ritual: arm at a cairn, then explicitly confirm with the awakening key. */
     public static boolean awaken(ServerPlayer player, BlockPos center) {
         var level=player.serverLevel();var state=HiveboundEvolution.data(player);long now=level.getGameTime();
         if (!player.isShiftKeyDown() || !player.getMainHandItem().is(Sporebound.TALISMAN.get())
-            || !player.getOffhandItem().is(Items.NETHER_STAR) || !RiftCairn.complete(level,center)
+            || !player.getOffhandItem().is(Items.AMETHYST_SHARD) || !RiftCairn.complete(level,center)
             || CorruptionData.get(level).index()!=-1 || Protection.mushroom(level,center)
             || player.isSpectator() || !player.isAlive() || !center.closerToCenterThan(player.position(),6))return false;
         if(!state.getString("AwakeningDimension").equals(level.dimension().location().toString())
@@ -25,7 +25,7 @@ public final class HiveProgression {
             ||!state.contains("AwakeningUntil")) {
             state.putString("AwakeningDimension",level.dimension().location().toString());state.putLong("AwakeningSite",center.asLong());
             state.putLong("AwakeningUntil",now+200);state.putLong("AwakeningStart",now);
-            player.displayClientMessage(Component.literal("Awaken this dimension? Run /hive awaken confirm within 10 seconds while staying here. This consumes one Nether Star and permits Spore infection."),false);
+            player.displayClientMessage(Component.literal("Awaken this dimension? Press your Confirm Awakening key (default K) within 10 seconds while staying here. This consumes one amethyst shard and permits Spore infection."),false);
             return true;
         }
         return true;
@@ -36,7 +36,7 @@ public final class HiveProgression {
             ||!state.getString("AwakeningDimension").equals(level.dimension().location().toString()))return false;
         var center=BlockPos.of(state.getLong("AwakeningSite"));
         if(!player.getMainHandItem().is(Sporebound.TALISMAN.get())
-            ||!player.getOffhandItem().is(Items.NETHER_STAR)||!RiftCairn.complete(level,center)
+            ||!player.getOffhandItem().is(Items.AMETHYST_SHARD)||!RiftCairn.complete(level,center)
             ||CorruptionData.get(level).index()!=-1||Protection.mushroom(level,center)
             ||player.isSpectator()||!player.isAlive()||!center.closerToCenterThan(player.position(),6))return false;
         CorruptionData.get(level).set(0);player.getOffhandItem().shrink(1);state.remove("AwakeningUntil");

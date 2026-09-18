@@ -31,7 +31,7 @@ public final class SurvivorColonies extends SavedData {
     public static boolean allowed(ServerLevel level){return level.dimension().equals(Level.OVERWORLD)||level.dimension().equals(Level.NETHER)||level.dimension().equals(Sporebound.BLIGHT);}
     private static boolean natural(net.minecraft.world.level.block.state.BlockState state){return state.is(net.minecraft.tags.BlockTags.DIRT)
         ||state.is(Blocks.STONE)||state.is(Blocks.GRAVEL)||state.is(Blocks.SAND)||state.is(Blocks.NETHERRACK)
-        ||state.is(Blocks.BLACKSTONE)||state.is(Blocks.BASALT)||state.is(FungalContent.CRUST.get())
+        ||state.is(Blocks.BLACKSTONE)||state.is(Blocks.BASALT)||(state.is(FungalContent.CRUST.get()) || state.is(FungalContent.PALE.get()))
         ||state.is(com.Harbinger.Spore.core.Sblocks.INFESTED_DIRT.get());}
     public static boolean site(ServerLevel level,BlockPos base){
         for(int x=-3;x<=3;x++)for(int z=-3;z<=3;z++){

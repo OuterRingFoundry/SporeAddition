@@ -6,5 +6,5 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
 @EventBusSubscriber(modid=Sporebound.ID,value=Dist.CLIENT)
 public final class ClientLifecycle {
-    @SubscribeEvent public static void logout(ClientPlayerNetworkEvent.LoggingOut event){CorruptionPayload.ClientState.current=null;EvolutionPayload.ClientState.current=null;HiveSensePayload.ClientState.current=null;InfusionPayload.ClientState.stages.clear();}
+    @SubscribeEvent public static void logout(ClientPlayerNetworkEvent.LoggingOut event){HiveControls.reset();CorruptionPayload.ClientState.current=null;EvolutionPayload.ClientState.current=null;HiveSensePayload.ClientState.current=null;InfusionPayload.ClientState.stages.clear();}
 }

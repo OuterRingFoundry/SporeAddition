@@ -57,6 +57,9 @@ public final class CollectiveClientValidation {
             check.accept(!HiveSensePayload.ClientState.current.sites().isEmpty(),"real client receives native Spore node locations");
             check.accept(mc.getEntityRenderDispatcher().getRenderer((Survivor)victim) instanceof SurvivorRenderer,"survivor uses a player skin renderer");
             check.accept(mc.getResourceManager().getResource(mc.getEntityRenderDispatcher().getRenderer(victim).getTextureLocation(victim)).isPresent(),"survivor player skin resolves to a real Minecraft texture");
+            check.accept(java.util.Arrays.asList(mc.options.keyMappings).contains(HiveControls.NETWORK)
+                &&java.util.Arrays.asList(mc.options.keyMappings).contains(HiveControls.AWAKEN),"Hive controls are registered in real client settings");
+            check.accept(HiveControls.selection()!=null,"client selects a sensed Hive destination without commands");
             screenshot.accept("14-hive-sense.png");mc.setScreen(new net.minecraft.client.gui.screens.inventory.InventoryScreen(mc.player));phase=2;ticks=0;
         }else if(phase==2&&++ticks>=30){
             screenshot.accept("15-hive-infusion.png");mc.setScreen(null);

@@ -9,7 +9,7 @@ public final class HiveCommands {
     public static void register(RegisterCommandsEvent event) {
         event.getDispatcher().register(literal("hive")
             .then(literal("awaken").then(literal("confirm").executes(c->HiveProgression.confirmAwakening(c.getSource().getPlayerOrException())?1:
-                fail(c.getSource(),"First crouch-use a Rift Talisman on a complete cairn with a Nether Star offhand, then confirm here within 10 seconds. Only Index -1 can awaken."))))
+                fail(c.getSource(),"First crouch-use a Rift Talisman on a complete cairn with a amethyst shard offhand, then confirm here within 10 seconds. Only Index -1 can awaken."))))
             .then(literal("nodes").executes(c->{
                 var p=c.getSource().getPlayerOrException();if(!Hivebound.member(p))return fail(c.getSource(),"Wear the full Hivebound set to sense the network.");
                 var nodes=HiveNodes.get(p.serverLevel()).available(p.serverLevel());

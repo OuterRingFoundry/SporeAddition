@@ -103,12 +103,12 @@ public final class CollectiveValidation {
             new com.mojang.authlib.GameProfile(UUID.fromString("30000000-0000-0000-0000-000000000017"),"awakening-test"));
         player.moveTo(base.getX()+0.5,base.getY(),base.getZ()+0.5);player.setGameMode(GameType.SURVIVAL);
         player.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND,new ItemStack(Sporebound.TALISMAN.get()));
-        player.setItemInHand(net.minecraft.world.InteractionHand.OFF_HAND,new ItemStack(Items.NETHER_STAR,2));
+        player.setItemInHand(net.minecraft.world.InteractionHand.OFF_HAND,new ItemStack(Items.AMETHYST_SHARD,2));
         player.setShiftKeyDown(true);
         check.accept(HiveProgression.awaken(player,base.below())&&CorruptionData.get(level).index()==-1,"first deliberate ritual interaction only arms awakening");
         check.accept(HiveProgression.awaken(player,base.below())&&CorruptionData.get(level).index()==-1,"holding ritual interaction cannot confirm awakening");
         player.setShiftKeyDown(false); // Opening chat releases held sneak on a real client.
-        check.accept(HiveProgression.confirmAwakening(player)&&CorruptionData.get(level).index()==0&&player.getOffhandItem().getCount()==1,"confirmed ritual consumes exactly one Nether Star and changes minus one to zero");
+        check.accept(HiveActionPayload.execute(player,new HiveActionPayload(HiveActionPayload.AWAKEN,BlockPos.ZERO))&&CorruptionData.get(level).index()==0&&player.getOffhandItem().getCount()==1,"confirmed ritual consumes exactly one amethyst shard and changes minus one to zero");
         CorruptionData.get(level).set(-2);
         check.accept(!HiveProgression.awaken(player,base.below())&&CorruptionData.get(level).index()==-2,"awakening cannot unlock a purged dimension");
         CorruptionData.get(level).set(-1);player.getInventory().clearContent();

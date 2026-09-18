@@ -15,6 +15,8 @@ public final class FungalContent {
     private static final DeferredRegister.Blocks BLOCKS = DeferredRegister.createBlocks(Sporebound.ID);
     private static final DeferredRegister<EntityType<?>> ENTITIES = DeferredRegister.create(Registries.ENTITY_TYPE, Sporebound.ID);
     public static final java.util.function.Supplier<Block> CRUST = BLOCKS.register("remnant_mycelium",
+        () -> new SporeMyceliumBlock(BlockBehaviour.Properties.of().strength(0.6F).sound(SoundType.GRAVEL).randomTicks()));
+    public static final java.util.function.Supplier<Block> PALE = BLOCKS.register("pale_remnant",
         () -> new Block(BlockBehaviour.Properties.of().strength(1.5F, 3).sound(SoundType.WART_BLOCK)));
     public static final java.util.function.Supplier<EntityType<InfectedBiomass>> BIOMASS = ENTITIES.register("infected_biomass",
         () -> EntityType.Builder.of(InfectedBiomass::new, MobCategory.MONSTER).sized(0.9F, 0.5F)
@@ -26,6 +28,7 @@ public final class FungalContent {
         Sporebound.ITEMS.register("survivor_spawn_egg", () -> new net.neoforged.neoforge.common.DeferredSpawnEggItem(
             SURVIVOR,0x916B43,0x7CAE95,new Item.Properties()));
         bus.addListener((net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent event) -> event.put(SURVIVOR.get(),Survivor.attributes().build()));
+        Sporebound.ITEMS.register("pale_remnant", () -> new BlockItem(PALE.get(), new Item.Properties()));
         Sporebound.ITEMS.register("remnant_mycelium", () -> new BlockItem(CRUST.get(), new Item.Properties()));
         Sporebound.ITEMS.register("infected_biomass_spawn_egg", () -> new net.neoforged.neoforge.common.DeferredSpawnEggItem(
             BIOMASS, 0xA2797C, 0xDDD8BB, new Item.Properties()));
@@ -33,7 +36,7 @@ public final class FungalContent {
             event.put(BIOMASS.get(), InfectedBiomass.attributes().build()));
         bus.addListener((net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent event) -> {
             if (event.getTabKey().equals(net.minecraft.world.item.CreativeModeTabs.SPAWN_EGGS)) event.accept(Sporebound.ITEMS.getEntries().stream().filter(x->x.getId().getPath().equals("survivor_spawn_egg")).findFirst().orElseThrow().get());
-            if (event.getTabKey().equals(net.minecraft.world.item.CreativeModeTabs.NATURAL_BLOCKS)) event.accept(CRUST.get());
+            if (event.getTabKey().equals(net.minecraft.world.item.CreativeModeTabs.NATURAL_BLOCKS)) { event.accept(CRUST.get()); event.accept(PALE.get()); }
             if (event.getTabKey().equals(net.minecraft.world.item.CreativeModeTabs.SPAWN_EGGS))
                 event.accept(Sporebound.ITEMS.getEntries().stream().filter(x -> x.getId().getPath().equals("infected_biomass_spawn_egg")).findFirst().orElseThrow().get());
         });

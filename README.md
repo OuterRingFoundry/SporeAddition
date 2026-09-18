@@ -5,6 +5,10 @@ It adds a corrupted Overworld-like dimension, per-dimension corruption, and perm
 Spore protection for Overworld mushroom islands. This is an independent addon, not
 an official Spore release.
 
+## Sporebound 0.8.0
+
+Restores pale fungal terrain and custom mycelium spread, adds configurable Hive keys and distant beacon indicators, lowers armor and awakening costs, unlocks Evolved wall climbing, and gives survivors persistent equipment progression and Infected Adventurer conversion. See [mechanics and controls](docs/RELEASE_0.8.0.md).
+
 ## Sporebound 0.7.0
 
 Version 0.7.0 adds shared Hive intelligence and private Hivebound sight, node travel,
@@ -26,8 +30,8 @@ See [mechanics and limits](docs/RELEASE_0.5.0.md).
 
 ## Installation
 
-Use the built `sporebound-0.7.0.jar` and its SHA-256 checksum.
-The complete controls and progression are in [the release notes](docs/RELEASE_0.7.0.md).
+Use the built `sporebound-0.8.0.jar` and its SHA-256 checksum.
+The complete controls and progression are in [the release notes](docs/RELEASE_0.8.0.md).
 Replace the older Sporebound JAR on both server and clients; keep only one version.
 
 
@@ -156,7 +160,7 @@ existing underwater turf and damaged structures are not automatically rebuilt.
 | 5–10 | Hive Minds and Calamities permitted, with continuing growth and scaling. |
 
 The Overworld, Nether, End and other external dimensions default to **-1**. The
-Blighted World defaults to **6**. Index -1 can be unlocked deliberately by the two-step Nether Star cairn ritual;
+Blighted World defaults to **6**. Index -1 can be unlocked deliberately by the two-step amethyst-shard cairn ritual (crouch-use, then the awakening key);
 -2 requires an OP command. Evolved Hivebound melee infections can raise Index 0.
 Population growth alone never increases -2, -1 or 0. Mushroom fields remain immune at every index.
 Spore structures and template placement are confined to the Blighted World even
