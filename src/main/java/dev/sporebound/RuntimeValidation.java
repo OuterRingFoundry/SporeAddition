@@ -78,6 +78,7 @@ public final class RuntimeValidation {
         HiveboundValidation.run(blight, RuntimeValidation::require);
         CollectiveValidation.run(blight, RuntimeValidation::require);
         FrontierValidation.run(blight, RuntimeValidation::require);
+        SurvivorCombatValidation.run(blight, RuntimeValidation::require);
         int founders=0;
         for(var entity:blight.getAllEntities())if(entity instanceof com.Harbinger.Spore.Sentities.Organoids.Proto)founders++;
         require(founders==1,"exactly one initial Hive Mind: "+founders);

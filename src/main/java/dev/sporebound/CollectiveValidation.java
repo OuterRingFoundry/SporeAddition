@@ -70,6 +70,8 @@ public final class CollectiveValidation {
         check.accept(colonies.found(level,base),"three survivors naturally establish a colony on eligible terrain");
         var residents=level.getEntitiesOfClass(Survivor.class,new net.minecraft.world.phys.AABB(base).inflate(8));
         check.accept(residents.size()==3&&residents.stream().allMatch(s->s.home().equals(base)),"colony members retain a common home");
+        check.accept(residents.stream().filter(Survivor::archer).count()==1
+            &&residents.stream().filter(s->s.getOffhandItem().is(Items.SHIELD)).count()==2,"new colony reliably spawns one archer and two shield defenders");
         var worker=residents.getFirst();worker.moveTo(base.getX(),base.getY(),base.getZ());
         var item=new net.minecraft.world.entity.item.ItemEntity(level,worker.getX()+0.5,worker.getY(),worker.getZ(),new ItemStack(Items.IRON_INGOT,3));level.addFreshEntity(item);
         check.accept(worker.collect(item)&&item.isRemoved()&&worker.supplies().countItem(Items.IRON_INGOT)==3,"survivor collects dropped resources without duplication");

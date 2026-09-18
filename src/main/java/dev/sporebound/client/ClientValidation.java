@@ -195,6 +195,7 @@ public final class ClientValidation {
             if(!SymbiosisClientValidation.tick(ClientValidation::check,ClientValidation::shot))return;
             if(!CollectiveClientValidation.tick(ClientValidation::check,ClientValidation::shot))return;
             if(!FrontierClientValidation.tick(ClientValidation::check,ClientValidation::shot))return;
+            if(!SurvivorClientValidation.tick(ClientValidation::check,ClientValidation::shot))return;
             if(completionTick<0)completionTick=serverTicks;
             // Let tracking, screenshots and generation settle before exercising save-and-quit.
             if(serverTicks-completionTick<100)return;

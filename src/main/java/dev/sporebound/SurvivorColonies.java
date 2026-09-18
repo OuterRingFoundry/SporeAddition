@@ -47,6 +47,8 @@ public final class SurvivorColonies extends SavedData {
             var survivor=FungalContent.SURVIVOR.get().create(level);if(survivor==null){residents.forEach(net.minecraft.world.entity.Entity::discard);return false;}
             survivor.moveTo(base.getX()+i-0.5,base.getY(),base.getZ()+0.5,0,0);survivor.settle(base);
             survivor.finalizeSpawn(level,level.getCurrentDifficultyAt(base),MobSpawnType.EVENT,null);
+            // Every new three-person colony has an archer and two sword/shield defenders.
+            if(i==0)survivor.equipStarterCombat(true);
             survivor.supplies().addItem(new ItemStack(Items.COBBLESTONE,32));survivor.supplies().addItem(new ItemStack(Items.BREAD,8));
             survivor.supplies().addItem(new ItemStack(Items.TORCH,4));
             if(!level.addFreshEntity(survivor)){residents.forEach(net.minecraft.world.entity.Entity::discard);return false;}residents.add(survivor);

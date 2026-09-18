@@ -19,11 +19,39 @@ import net.neoforged.neoforge.event.EventHooks;
 import java.util.*;
 
 /** Persistent player-like survivor: supplies, harvesting, combat, healing and patrols. */
-public final class Survivor extends PathfinderMob {
+public final class Survivor extends PathfinderMob implements net.minecraft.world.entity.monster.RangedAttackMob {
     private static final EntityDataAccessor<Integer> SKIN=SynchedEntityData.defineId(Survivor.class,EntityDataSerializers.INT);
     private final SimpleContainer supplies=new SimpleContainer(18);
     private BlockPos home;
-    private int experience,fuel;
+    private int experience,fuel,shieldCooldown;
+    private boolean archer;
+    public boolean archer(){return archer;}
+    public boolean usingBow(){return getMainHandItem().is(Items.BOW)&&supplies.countItem(Items.ARROW)>0;}
+    public int shieldCooldown(){return shieldCooldown;}
+    /** Starter equipment is assigned only when a new resident is spawned. */
+    public void equipStarterCombat(boolean ranged){
+        archer=ranged;
+        setItemSlot(EquipmentSlot.MAINHAND,new ItemStack(ranged?Items.BOW:Items.STONE_SWORD));
+        setItemSlot(EquipmentSlot.OFFHAND,ranged?ItemStack.EMPTY:new ItemStack(Items.SHIELD));
+        setDropChance(EquipmentSlot.MAINHAND,0);setDropChance(EquipmentSlot.OFFHAND,0);
+        if(ranged){supplies.addItem(new ItemStack(Items.ARROW,16));supplies.addItem(new ItemStack(Items.STONE_SWORD));}
+    }
+    @Override public void performRangedAttack(LivingEntity target,float power){SurvivorCombat.shoot(this,target,power);}
+    @Override public boolean hurt(net.minecraft.world.damagesource.DamageSource source,float amount){
+        if(source.getDirectEntity() instanceof net.minecraft.world.entity.projectile.AbstractArrow
+            &&source.getEntity() instanceof Survivor)return false;
+        return super.hurt(source,amount);
+    }
+    @Override protected void hurtCurrentlyUsedShield(float amount){
+        if(getUseItem().is(Items.SHIELD)&&amount>=3){
+            getUseItem().hurtAndBreak(1+(int)amount,this,EquipmentSlot.OFFHAND);
+            if(getOffhandItem().isEmpty())stopUsingItem();
+        }
+    }
+    @Override protected void blockUsingShield(LivingEntity attacker){
+        super.blockUsingShield(attacker);
+        if(attacker.getMainHandItem().getItem() instanceof AxeItem){shieldCooldown=100;stopUsingItem();}
+    }
     private boolean furnace;
     private ItemStack miningTool=new ItemStack(Items.STONE_PICKAXE);
     public int experience(){return experience;}
@@ -46,7 +74,12 @@ public final class Survivor extends PathfinderMob {
     public void settle(BlockPos pos){home=pos.immutable();restrictTo(home,192);}
     public SimpleContainer supplies(){return supplies;}
     @Override protected void registerGoals(){
-        goalSelector.addGoal(0,new FloatGoal(this));goalSelector.addGoal(1,new MeleeAttackGoal(this,1.15,true));
+        goalSelector.addGoal(0,new FloatGoal(this));
+        goalSelector.addGoal(1,new RangedBowAttackGoal<Survivor>(this,1.0,35,16){
+            @Override public boolean canUse(){return usingBow()&&super.canUse();}
+            @Override public boolean canContinueToUse(){return usingBow()&&super.canContinueToUse();}
+        });
+        goalSelector.addGoal(2,new SurvivorCombat.Melee(this));
         goalSelector.addGoal(3,new WorkGoal());goalSelector.addGoal(6,new WaterAvoidingRandomStrollGoal(this,0.7));
         goalSelector.addGoal(7,new LookAtPlayerGoal(this,net.minecraft.world.entity.player.Player.class,8));goalSelector.addGoal(8,new RandomLookAroundGoal(this));
         targetSelector.addGoal(1,new HurtByTargetGoal(this,Survivor.class).setAlertOthers());
@@ -55,7 +88,7 @@ public final class Survivor extends PathfinderMob {
     }
     @Override public SpawnGroupData finalizeSpawn(net.minecraft.world.level.ServerLevelAccessor level,DifficultyInstance difficulty,MobSpawnType reason,SpawnGroupData data){
         var result=super.finalizeSpawn(level,difficulty,reason,data);entityData.set(SKIN,random.nextInt(9));
-        setItemSlot(EquipmentSlot.MAINHAND,new ItemStack(Items.STONE_SWORD));setDropChance(EquipmentSlot.MAINHAND,0);
+        equipStarterCombat((reason==MobSpawnType.SPAWN_EGG||reason==MobSpawnType.NATURAL)&&random.nextInt(3)==0);
         setCustomName(net.minecraft.network.chat.Component.literal(new String[]{"Ash","Rowan","Mira","Flint","Ember","Reed","Fern","Slate","Wren"}[skin()]));
         if(home==null)settle(blockPosition());return result;
     }
@@ -87,7 +120,9 @@ public final class Survivor extends PathfinderMob {
         }
     }
     @Override public void tick(){super.tick();if(!(level() instanceof ServerLevel server)||!isAlive()||isNoAi())return;
+        if(shieldCooldown>0)shieldCooldown--;
         if(tickCount%20==0){
+            SurvivorCombat.equipWeapon(this);SurvivorCombat.cooperate(this);
             for(var item:server.getEntitiesOfClass(ItemEntity.class,getBoundingBox().inflate(1.5)))collect(item);
             if(home==null)settle(blockPosition());craftPlanks(server);
             if(tickCount%100==0)SurvivorProgression.improve(this);
@@ -102,13 +137,14 @@ public final class Survivor extends PathfinderMob {
         if(!miningTool.isEmpty())spawnAtLocation(miningTool);miningTool=ItemStack.EMPTY;
     }
     @Override public void addAdditionalSaveData(CompoundTag tag){super.addAdditionalSaveData(tag);tag.putInt("SurvivorSkin",skin());
-        tag.putInt("Experience",experience);tag.putInt("SmeltingFuel",fuel);tag.putBoolean("Furnace",furnace);tag.put("MiningTool",miningTool.save(registryAccess()));
+        tag.putBoolean("Archer",archer);tag.putInt("ShieldCooldown",shieldCooldown);tag.putInt("Experience",experience);tag.putInt("SmeltingFuel",fuel);tag.putBoolean("Furnace",furnace);tag.put("MiningTool",miningTool.save(registryAccess()));
         if(home!=null)tag.putLong("ColonyHome",home.asLong());var list=new ListTag();
         for(int i=0;i<supplies.getContainerSize();i++)if(!supplies.getItem(i).isEmpty()){
             var t=new CompoundTag();t.putInt("Slot",i);t.put("Item",supplies.getItem(i).save(registryAccess()));list.add(t);}
         tag.put("Supplies",list);
     }
     @Override public void readAdditionalSaveData(CompoundTag tag){super.readAdditionalSaveData(tag);entityData.set(SKIN,Math.clamp(tag.getInt("SurvivorSkin"),0,8));
+        archer=tag.getBoolean("Archer");shieldCooldown=Math.clamp(tag.getInt("ShieldCooldown"),0,100);
         experience=Math.clamp(tag.getInt("Experience"),0,10000);fuel=Math.clamp(tag.getInt("SmeltingFuel"),0,8);furnace=tag.getBoolean("Furnace");
         if(tag.contains("MiningTool"))miningTool=ItemStack.parseOptional(registryAccess(),tag.getCompound("MiningTool"));
         SurvivorProgression.refresh(this);

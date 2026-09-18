@@ -41,3 +41,9 @@ Survivors gain experience from collecting supplies, harvesting/mining, smelting 
 They equip recovered stronger swords and armor, make sticks from planks, turn eight cobblestone into a saved portable furnace, and smelt raw iron with finite coal or charcoal (eight ore per fuel). They craft iron pickaxes, iron or diamond swords, and iron armor using real supplies. Tools determine valid ore drops and wear out through mining; replacements consume materials. Inventory, experience, armor, mining tool, furnace and remaining fuel survive reloads. Mob griefing and colony protection still govern work.
 
 An infected survivor's death creates Spore's native **Infected Adventurer**, retaining its character skin, name and equipped items. Supplies drop once; the equipment transfers once. It does not become generic Infected Biomass. Uninfected deaths remain ordinary deaths.
+
+### Survivor squads
+
+Each new colony has one archer and two sword-and-shield defenders. Nearby survivors alert idle allies to hostile targets, share spare arrows, and bring food to injured companions. Archers use vanilla bow movement and real arrows, hold fire when another survivor crosses their aim, and cannot damage survivors with their arrows. When ammunition runs out, they keep the bow and switch to a carried sword; resupply restores bow use.
+
+Defenders alternate blocking and striking. Shields use vanilla directional protection and raise delay, take durability damage, and are disabled for five seconds by an axe strike. Bow shots also wear the bow. Survivors equip recovered shields and can craft replacements from six planks and one iron, bows from three sticks and three string, and four arrows from one flint, stick and feather. Their combat role and carried ammunition persist with their saved equipment. The client shows bow-drawing and shield-blocking poses.

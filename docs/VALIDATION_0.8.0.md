@@ -32,3 +32,7 @@ The earlier client assertion used a general level chunk-presence API. The passin
 ## Execution scope
 
 The user explicitly approved development-branch upload and GitHub Actions testing. Main was not merged and the release publish job was skipped. This host lacks the Java, memory and disk capacity for the Minecraft checks. Resource JSON, Python syntax and whitespace were checked locally. The artifact download service returned HTTP 403 to this host, so screenshots were captured and checked for presence by CI but were not visually reviewed locally; use the GitHub artifact link above.
+
+## Survivor squad follow-up
+
+The cooperation/bow/shield follow-up is pending a new development-branch CI run; the passing run above validates the preceding portal build. Added native checks cover colony composition, ally alerts, real projectile ownership, ammunition and durability costs, friendly fire, shot obstruction by allies, sword fallback/resupply, food transfer, role persistence, directional shield protection, axe disabling, and replacement recipes. The real-client suite now requires a twentieth screenshot showing a drawing archer and blocking defender.

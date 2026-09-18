@@ -37,13 +37,21 @@ public final class SurvivorProgression {
             var stack=inv.getItem(i);EquipmentSlot slot=null;
             if(stack.getItem() instanceof ArmorItem armor&&armor.getDefense()>
                     (s.getItemBySlot(armor.getEquipmentSlot()).getItem() instanceof ArmorItem old?old.getDefense():0))slot=armor.getEquipmentSlot();
-            else if(sword(stack)>sword(s.getMainHandItem()))slot=EquipmentSlot.MAINHAND;
+            else if(!s.usingBow()&&sword(stack)>sword(s.getMainHandItem()))slot=EquipmentSlot.MAINHAND;
+            else if(stack.is(Items.SHIELD)&&s.getOffhandItem().isEmpty())slot=EquipmentSlot.OFFHAND;
             if(slot!=null){var old=s.getItemBySlot(slot);s.setItemSlot(slot,inv.removeItem(i,1));s.setDropChance(slot,1);
                 if(!old.isEmpty()){var left=inv.addItem(old);if(!left.isEmpty())s.spawnAtLocation(left);}}
         }
+        int remainingPlanks=0;for(int i=0;i<inv.getContainerSize();i++)if(inv.getItem(i).is(ItemTags.PLANKS))remainingPlanks+=inv.getItem(i).getCount();
+        if(s.getOffhandItem().isEmpty()&&remainingPlanks>=6&&inv.countItem(Items.IRON_INGOT)>0){
+            spend(inv,Items.IRON_INGOT,1);int needed=6;
+            for(int i=0;i<inv.getContainerSize()&&needed>0;i++)if(inv.getItem(i).is(ItemTags.PLANKS)){
+                int n=Math.min(needed,inv.getItem(i).getCount());inv.removeItem(i,n);needed-=n;}
+            s.setItemSlot(EquipmentSlot.OFFHAND,new ItemStack(Items.SHIELD));s.setDropChance(EquipmentSlot.OFFHAND,1);
+        }
         // Two planks make four sticks, matching the vanilla material cost.
         int planks=0;for(int i=0;i<inv.getContainerSize();i++)if(inv.getItem(i).is(ItemTags.PLANKS))planks+=inv.getItem(i).getCount();
-        if(inv.countItem(Items.STICK)<2&&planks>=2&&inv.canAddItem(new ItemStack(Items.STICK,4))){
+        if(inv.countItem(Items.STICK)<(s.archer()?3:2)&&planks>=2&&inv.canAddItem(new ItemStack(Items.STICK,4))){
             int remaining=2;for(int i=0;i<inv.getContainerSize()&&remaining>0;i++)if(inv.getItem(i).is(ItemTags.PLANKS)){
                 int n=Math.min(remaining,inv.getItem(i).getCount());inv.removeItem(i,n);remaining-=n;}
             inv.addItem(new ItemStack(Items.STICK,4));
@@ -61,9 +69,18 @@ public final class SurvivorProgression {
                 &&inv.countItem(Items.IRON_INGOT)>=3&&inv.countItem(Items.STICK)>=2){
             spend(inv,Items.IRON_INGOT,3);spend(inv,Items.STICK,2);s.setMiningTool(new ItemStack(Items.IRON_PICKAXE));
         }
+        if(s.archer()&&!s.getMainHandItem().is(Items.BOW)&&inv.countItem(Items.BOW)==0
+            &&inv.countItem(Items.STRING)>=3&&inv.countItem(Items.STICK)>=3&&inv.canAddItem(new ItemStack(Items.BOW))){
+            spend(inv,Items.STRING,3);spend(inv,Items.STICK,3);inv.addItem(new ItemStack(Items.BOW));
+        }
+        if(s.archer()&&inv.countItem(Items.ARROW)<16&&inv.countItem(Items.FLINT)>0&&inv.countItem(Items.FEATHER)>0
+            &&inv.countItem(Items.STICK)>0&&inv.canAddItem(new ItemStack(Items.ARROW,4))){
+            spend(inv,Items.FLINT,1);spend(inv,Items.FEATHER,1);spend(inv,Items.STICK,1);inv.addItem(new ItemStack(Items.ARROW,4));
+        }
+        SurvivorCombat.equipWeapon(s);
         Item material=inv.countItem(Items.DIAMOND)>=2?Items.DIAMOND:Items.IRON_INGOT;
         Item weapon=material==Items.DIAMOND?Items.DIAMOND_SWORD:Items.IRON_SWORD;
-        if(sword(s.getMainHandItem())<sword(new ItemStack(weapon))&&inv.countItem(material)>=2&&inv.countItem(Items.STICK)>=1){
+        if(!s.usingBow()&&sword(s.getMainHandItem())<sword(new ItemStack(weapon))&&inv.countItem(material)>=2&&inv.countItem(Items.STICK)>=1){
             spend(inv,material,2);spend(inv,Items.STICK,1);var old=s.getMainHandItem();s.setItemSlot(EquipmentSlot.MAINHAND,new ItemStack(weapon));
             s.setDropChance(EquipmentSlot.MAINHAND,1);var left=inv.addItem(old);if(!left.isEmpty())s.spawnAtLocation(left);
         }
