@@ -21,7 +21,7 @@ jobs:
           sudo apt-get install -y xvfb libgl1-mesa-dri libglx-mesa0 libopenal1
           python3 scripts/client-acceptance.py --source run-ci-core/world --civilis
       - name: Checksum validated build
-        run: sha256sum build/libs/sporebound-0.8.0.jar > build/libs/sporebound-0.8.0.jar.sha256
+        run: sha256sum build/libs/sporebound-0.8.0.jar | tee build/libs/sporebound-0.8.0.jar.sha256
       - uses: actions/upload-artifact@v4
         if: always()
         with:

@@ -68,7 +68,7 @@ if timed_out:
         if 'SPOREBOUND SHUTDOWN CHUNK REQUEST' in line:print('\n'.join(lines[index:index+35]))
 if timed_out:print('Client acceptance exceeded its startup/test or 60-second shutdown deadline; process group stopped.')
 assert not timed_out and process.returncode==0 and 'SPOREBOUND CLIENT ACCEPTANCE PASS' in text, '\n'.join(line for line in text.splitlines() if any(word in line for word in ['AssertionError', 'CHECK PASS', 'Caused by:', 'Exception']))+'\n'+text[-10000:]
-for name in ['01-dormant','02-blighted-world','03-overrun','04-return','05-remnant-grove','06-ribbed-highlands','07-hud-off','08-fungal-remnants','09-biomass-absorption','10-biomass-integrated','11-index-art-stages','12-hivebound-armor','13-hivebound-evolution','14-hive-sense','15-hive-infusion']:
+for name in ['01-dormant','02-blighted-world','03-overrun','04-return','05-remnant-grove','06-ribbed-highlands','07-hud-off','08-fungal-remnants','09-biomass-absorption','10-biomass-integrated','11-index-art-stages','12-hivebound-armor','13-hivebound-evolution','14-hive-sense','15-hive-infusion','16-hive-network-controls','17-distant-hive-beacon']:
     assert (run/'screenshots'/(name+'.png')).is_file(),name
 assert 'arrival is above bedrock and collision free' in text
 assert 'arrival has a solid landing surface' in text

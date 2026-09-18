@@ -15,6 +15,7 @@ public final class HiveNetworkScreen extends Screen {
         addRenderableWidget(Button.builder(Component.literal("Confirm cairn awakening"),b->{HiveControls.send(HiveActionPayload.AWAKEN);onClose();}).bounds(x,y+72,300,20).build());
     }
     @Override public void render(GuiGraphics g,int mx,int my,float delta){
+        g.fill(width/2-170,height/2-96,width/2+170,height/2+120,0xDE141B16);
         super.render(g,mx,my,delta);int y=height/2-82;
         g.drawCenteredString(font,title,width/2,y,0xFFEADDAE);
         var site=HiveControls.selection();
